@@ -223,6 +223,10 @@
     .auth-form { display:none; gap:14px; }
     .auth-form.active { display:grid; }
 
+
+    /* --- MANUAL LIBRARY + PROFILE + SMART LOGGING --- */
+    .library-tabs{display:inline-flex;gap:6px;padding:5px;border:1px solid var(--border);border-radius:999px;background:var(--bg);flex-wrap:wrap}.library-tabs button{background:transparent;color:var(--muted);border-radius:999px;padding:9px 14px}.library-tabs button.active{background:var(--brand);color:#fff}.library-panel{display:none}.library-panel.active{display:block}.visual-card{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);padding:18px;display:grid;gap:10px}.visual-card:hover{border-color:rgba(59,130,246,.7);transform:translateY(-1px)}.link-list{display:flex;gap:8px;flex-wrap:wrap}.link-list a{color:var(--brand);border:1px solid rgba(59,130,246,.35);border-radius:999px;padding:5px 9px;text-decoration:none;font-size:.78rem}.micro-grid{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px}.micro-stat{border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--panel)}.micro-stat strong{display:block;color:#fff;font-size:1rem}.auto-estimate{border-left:4px solid var(--brand)}.body-map.real-human{align-items:start}.body-map.real-human svg{max-width:280px}.heatmap-shell{display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:18px;align-items:center;width:100%}.heatmap-list{display:grid;gap:8px}.heatmap-list div{display:flex;justify-content:space-between;gap:12px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:var(--panel)}@media(max-width:720px){.micro-grid,.heatmap-shell{grid-template-columns:1fr}}
+
     @media(max-width: 720px) {
       main { padding: 18px 16px 48px; }
       .topbar { margin: -18px -16px 18px; padding: 14px 16px; align-items:flex-start; flex-direction:column; }
@@ -335,7 +339,7 @@
     <section id="profile" class="page">
       <div class="grid">
         <div class="card wide">
-          <h3>Physique & Identity Data</h3>
+          <h3>My Profile</h3><p class="muted small" style="margin-top:-8px;">Your profile stays saved after setup. Use Edit Details only when your body data or goals change.</p>
           <form id="profileForm" onsubmit="handleFormSubmit(event,'Users')">
             <div class="form-grid">
               <div class="field full"><label>Full Name</label><input name="FullName" value="Palliyawattage Nikitha Chathu Keshan Gomes" required></div>
@@ -367,7 +371,7 @@
               <div class="field"><label>Dietary Preference</label><select name="DietPreference"><option>Meat based</option><option>Vegetarian</option><option>Vegan</option><option selected>Mixed (Pizza/Dairy included)</option></select></div>
               <div class="field full"><label>Profile Image URL</label><input type="url" name="PhotoURL" placeholder="https://..."></div>
             </div>
-            <div class="toolbar" style="margin-top:24px"><button>Save to Database</button><button type="button" class="secondary" onclick="loadLatestProfile()">Sync from Sheets</button></div>
+            <div class="toolbar" style="margin-top:24px"><button>Save Profile</button><button type="button" class="secondary" onclick="toggleProfileEdit(false)">Lock Details</button><button type="button" class="secondary" onclick="toggleProfileEdit(true)">Edit Details</button><button type="button" class="secondary" onclick="loadLatestProfile()">Sync from Sheets</button></div>
           </form>
         </div>
         <div class="card third">
@@ -478,16 +482,19 @@
           <h3>Register Milestone (PR)</h3>
           <form onsubmit="handlePRSubmit(event)">
             <div class="form-grid">
-              <div class="field half"><label>Movement</label><input name="Exercise" placeholder="e.g. Barbell Squat" required></div>
+              <div class="field half"><label>Workout Type</label><input name="WorkoutType" list="workoutTypeSuggestions" placeholder="Push / Pull / Legs / Chest / Back" required></div>
+              <div class="field half"><label>Movement</label><input name="Exercise" list="exerciseSuggestions" oninput="applyExerciseSuggestion(this)" placeholder="e.g. Barbell Squat" required></div>
               <div class="field half"><label>Date</label><input type="date" name="Date" required></div>
-              <div class="field half"><label>Load (kg)</label><input type="number" step="0.5" name="Weight" required></div>
-              <div class="field half"><label>Repetitions</label><input type="number" name="Reps" required></div>
+              <div class="field quarter"><label>Load (kg)</label><input type="number" step="0.5" name="Weight" required></div>
+              <div class="field quarter"><label>Repetitions</label><input type="number" name="Reps" required></div>
+              <div class="field full"><label>Notes</label><input name="Notes" placeholder="optional milestone notes"></div>
             </div>
             <button style="margin-top:24px">Commit Record</button>
           </form>
+          <datalist id="workoutTypeSuggestions"><option>Push</option><option>Pull</option><option>Legs</option><option>Chest</option><option>Back</option><option>Shoulders</option><option>Arms</option><option>Upper</option><option>Lower</option><option>Full Body</option></datalist>
         </div>
-        <div class="card half"><h3>Estimated 1RM Trajectory</h3><div class="chart-container" style="height: 180px;"><canvas id="prChart"></canvas></div></div>
-        <div class="card full"><h3>Record Ledger</h3><div id="prHistory"></div></div>
+        <div class="card half"><div class="statline"><h3>Workout-wise 1RM Trajectory</h3><select id="prWorkoutFilter" onchange="renderPRDashboard()" style="width:auto;"><option value="All">All Workouts</option></select></div><div class="chart-container" style="height:180px;"><canvas id="prChart"></canvas></div></div>
+        <div class="card full"><h3>Milestone Dashboard</h3><div id="prHistory"></div></div>
       </div>
     </section>
 
@@ -519,25 +526,13 @@
       </div>
     </section>
 
-    <section id="exercises" class="page">
-      <div class="grid">
-        <div class="card full">
-          <div class="statline">
-            <h3>Movement Database (API-NINJAS LIVE)</h3>
-            <button class="secondary" onclick="openModal('exerciseModal')">Register Custom Movement</button>
-          </div>
-          <p class="muted small">Fetching live data via api-ninjas.com API.</p>
-          <div class="form-grid" style="margin-bottom: 24px;">
-            <div class="field full"><label>Search Live Exercises</label>
-              <div style="display:flex; gap:12px;">
-                <input id="apiExerciseSearch" placeholder="e.g., Squat, Bicep curl..." onkeypress="if(event.key==='Enter') searchLiveExercises()">
-                <button type="button" onclick="searchLiveExercises()">Search API</button>
-              </div>
-            </div>
-          </div>
-          <div id="exerciseDb"><div class="empty">Type a movement and search the API.</div></div>
-        </div>
-      </div>
+    <section id="library" class="page">
+      <div class="grid"><div class="card full">
+        <div class="statline"><div><h3>Database Hub</h3><p class="muted small" style="margin:0;">Workout searcher, manual recipe database, and manual influencer database in one page.</p></div><div class="library-tabs"><button type="button" class="active" onclick="setLibraryTab('exerciseLibrary',this)">Workout Searcher</button><button type="button" onclick="setLibraryTab('recipeLibraryPanel',this)">Recipes</button><button type="button" onclick="setLibraryTab('influencerLibraryPanel',this)">Influencers</button></div></div>
+        <div id="exerciseLibrary" class="library-panel active"><div class="form-grid"><div class="field full"><label>Workout / Exercise Search</label><div style="display:flex;gap:12px;"><input id="apiExerciseSearch" list="exerciseSuggestions" placeholder="Search exercises, or type manually in workout forms" oninput="searchLiveExercises()"><button type="button" onclick="searchLiveExercises(true)">Search</button></div></div></div><div id="exerciseDb"><div class="empty">Type a movement to search saved and built-in exercises.</div></div></div>
+        <div id="recipeLibraryPanel" class="library-panel"><form id="manualRecipeForm" onsubmit="addRecipe(event)"><div class="form-grid"><div class="field"><label>Recipe Name</label><input name="RecipeName" required></div><div class="field"><label>Category</label><input name="Category" placeholder="High protein / Cut / Bulk"></div><div class="field"><label>Meal Type</label><select name="MealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option><option>Pre-workout</option><option>Post-workout</option></select></div><div class="field"><label>Calories</label><input name="Calories" type="number"></div><div class="field"><label>Protein (g)</label><input name="Protein" type="number"></div><div class="field"><label>Carbs (g)</label><input name="Carbs" type="number"></div><div class="field"><label>Fats (g)</label><input name="Fats" type="number"></div><div class="field"><label>Sugar (g)</label><input name="Sugar" type="number"></div><div class="field"><label>Fiber (g)</label><input name="Fiber" type="number"></div><div class="field"><label>Sodium (mg)</label><input name="Sodium_mg" type="number"></div><div class="field"><label>Image URL</label><input name="ImageURL" type="url"></div><div class="field"><label>Source URL</label><input name="SourceURL" type="url"></div><div class="field half"><label>Ingredients</label><textarea name="Ingredients" rows="4"></textarea></div><div class="field half"><label>Instructions</label><textarea name="Instructions" rows="4"></textarea></div></div><button style="margin-top:18px;">Save Manual Recipe</button></form><div id="recipeCards" class="grid"><div class="empty full">Saved recipes will appear here.</div></div></div>
+        <div id="influencerLibraryPanel" class="library-panel"><form id="manualInfluencerForm" onsubmit="addInfluencer(event)"><div class="form-grid"><div class="field"><label>Social Media Name</label><input name="SocialMediaName" required placeholder="e.g. Jeff Nippard"></div><div class="field"><label>Social Media</label><select name="Platform"><option>Instagram</option><option>YouTube</option><option>TikTok</option><option>Facebook</option><option>X / Twitter</option><option>Website</option><option>Multiple</option><option>Other</option></select></div><div class="field"><label>Handle</label><input name="Handle" placeholder="@name"></div><div class="field"><label>Niche</label><input name="Niche" placeholder="Hypertrophy / Nutrition / Rehab"></div><div class="field"><label>Content Type</label><input name="ContentType" placeholder="Tutorials, meal ideas, science"></div><div class="field"><label>Rating</label><select name="Rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div><div class="field full"><label>Links</label><textarea name="Links" rows="3" placeholder="Paste several platform links, one per line or separated by commas"></textarea></div><div class="field full"><label>Notes</label><textarea name="Notes" rows="3"></textarea></div></div><button style="margin-top:18px;">Save Influencer</button></form><div id="influencerCards" class="grid"><div class="empty full">Saved influencers will appear here.</div></div></div>
+      </div></div>
     </section>
 
     <section id="nutrition" class="page">
@@ -570,27 +565,6 @@
           </div>
         </div>
         <div class="card half"><h3>Computed Outputs</h3><div id="nutritionResults" class="muted">Awaiting biometric data.</div></div>
-      </div>
-    </section>
-
-    <section id="recipes" class="page">
-      <div class="grid">
-        <div class="card full">
-          <div class="statline">
-            <h3>Recipes — Manual + Automated</h3>
-            <button class="secondary" onclick="openModal('recipeModal')">Add Manual Recipe</button>
-          </div>
-          <p class="muted small">Add recipes manually or search automated recipes with macros through the backend Spoonacular API.</p>
-          <div class="form-grid" style="margin-bottom: 24px;">
-            <div class="field full"><label>Automated Recipe Search</label>
-              <div style="display:flex; gap:12px;">
-                <input id="apiRecipeSearch" placeholder="e.g., High protein chicken, vegan salad..." onkeypress="if(event.key==='Enter') searchLiveRecipes()">
-                <button type="button" onclick="searchLiveRecipes()">Search API</button>
-              </div>
-            </div>
-          </div>
-          <div id="recipeLibrary"><div class="empty">Type a food query and search the API.</div></div>
-        </div>
       </div>
     </section>
 
@@ -668,26 +642,7 @@
       </div>
     </section>
 
-    <section id="learn" class="page">
-      <div class="grid">
-        <div class="card full">
-          <div class="statline">
-            <h3>Influencer Search (YOUTUBE LIVE)</h3>
-            <button class="secondary" onclick="fetchLiveYoutubeVideos()">Search Videos</button>
-          </div>
-          <p class="muted small">Search fitness influencers, exercise tutorials, nutrition videos, or science-based training content through your backend YouTube API.</p>
-          <div class="form-grid" style="margin-bottom: 20px;">
-            <div class="field full"><label>Influencer / Topic Search</label>
-              <div style="display:flex; gap:12px;">
-                <input id="youtubeSearchQuery" placeholder="e.g. Jeff Nippard chest workout, push day, high protein meals" onkeypress="if(event.key==='Enter') fetchLiveYoutubeVideos()">
-                <button type="button" onclick="fetchLiveYoutubeVideos()">Search</button>
-              </div>
-            </div>
-          </div>
-          <div id="tipsLibrary" style="display:flex; flex-direction:column; gap:12px; margin-top: 16px;"><div class="empty">Search an influencer or topic to load YouTube API results.</div></div>
-        </div>
-      </div>
-    </section>
+
 
   </main>
 </div>
@@ -708,24 +663,9 @@
   </div>
 </div>
 
-<div class="modal" id="recipeModal">
-  <div class="modal-box">
-    <div class="statline"><h3>Add Formulation</h3><button class="secondary" style="padding:8px 16px; font-size:0.8rem;" onclick="closeModal('recipeModal')">Close</button></div>
-    <form onsubmit="addRecipe(event)" class="form-grid" style="margin-top: 16px;">
-      <div class="field half"><label>Name</label><input name="RecipeName" required></div>
-      <div class="field half"><label>Classification</label><input name="Category" required></div>
-      <div class="field quarter"><label>Kcal</label><input name="Calories" type="number"></div>
-      <div class="field quarter"><label>Pro (g)</label><input name="Protein" type="number"></div>
-      <div class="field quarter"><label>Carb (g)</label><input name="Carbs" type="number"></div>
-      <div class="field quarter"><label>Fat (g)</label><input name="Fats" type="number"></div>
-      <div class="field half"><label>Components</label><textarea name="Ingredients" rows="3"></textarea></div>
-      <div class="field half"><label>Procedure</label><textarea name="Instructions" rows="3"></textarea></div>
-      <div class="field full"><button>Store Formulation</button></div>
-    </form>
-  </div>
-</div>
-
 <div class="toast-container" id="toastContainer"></div>
+<datalist id="exerciseSuggestions"></datalist>
+<datalist id="foodSuggestions"></datalist>
 
 <script>
 /* =========================
@@ -793,45 +733,19 @@ const icons = {
 };
 
 const navItems = [
-  ['System','dashboard',icons.dash,'Overview'],['System','profile',icons.user,'Physique & Identity'],
+  ['System','dashboard',icons.dash,'Overview'],['System','profile',icons.user,'My Profile'],
   ['Training','planner',icons.plan,'Protocol Planner'],['Training','schedules',icons.plan,'Workout Schedules'],['Training','calendar',icons.cal,'Execution Calendar'],
-  ['Training','workoutLogs',icons.weight,'Session Entry'],['Training','prs',icons.trophy,'Records & 1RM'],
-  ['Training','intelligence',icons.brain,'AI Intelligence'],['Training','exercises',icons.db,'Movement DB'],
-  ['Nutrition','nutrition',icons.food,'Intake Logs'],['Nutrition','calculator',icons.calc,'Biometric Calc'],
-  ['Nutrition','recipes',icons.recipe,'Formulations'],['Recovery','recovery',icons.sleep,'Sleep & Recovery'],
-  ['Analytics','body',icons.ruler,'Measurements'],
-  ['Analytics','reports',icons.chart,'Aggregated Reports'],['Knowledge','learn',icons.book,'Influencer Search']
+  ['Training','workoutLogs',icons.weight,'Session Entry'],['Training','prs',icons.trophy,'Records & 1RM'],['Training','intelligence',icons.brain,'AI Intelligence'],
+  ['Database','library',icons.db,'Database Hub'],['Nutrition','nutrition',icons.food,'Intake Logs'],['Nutrition','calculator',icons.calc,'Biometric Calc'],
+  ['Recovery','recovery',icons.sleep,'Sleep & Recovery'],['Analytics','body',icons.ruler,'Measurements'],['Analytics','reports',icons.chart,'Aggregated Reports']
 ];
 
 /* =========================
    LIVE API FETCH FUNCTIONS
 ========================= */
 // 1. API-Ninjas Exercise Fetch through backend
-async function searchLiveExercises() {
-  const query = document.getElementById('apiExerciseSearch').value.trim();
-  if (!query) return toast('Please enter a search term', 'warning');
-  document.getElementById('exerciseDb').innerHTML = '<div class="empty">Loading backend exercise data...</div>';
-  try {
-    const data = await backendApi(API_PROVIDERS.apiNinjas, { name: query });
-    if (!data.length) {
-      document.getElementById('exerciseDb').innerHTML = '<div class="empty">No exercises found.</div>';
-      return;
-    }
-    const html = `<div class="table-wrap"><table><thead><tr><th>Name</th><th>Muscle</th><th>Equipment</th><th>Difficulty</th><th>Instructions</th></tr></thead><tbody>
-      ${data.map(ex => `<tr>
-        <td style="color:var(--brand); font-weight:bold;">${escapeHtml(ex.name)}</td>
-        <td><span class="badge info">${escapeHtml(ex.muscle)}</span></td>
-        <td>${escapeHtml(ex.equipment)}</td>
-        <td>${escapeHtml(ex.difficulty)}</td>
-        <td style="font-size:0.8rem; line-height:1.4;">${escapeHtml(String(ex.instructions || '').slice(0, 150))}...</td>
-      </tr>`).join('')}
-    </tbody></table></div>`;
-    document.getElementById('exerciseDb').innerHTML = html;
-    toast('Exercises loaded successfully');
-  } catch(e) {
-    document.getElementById('exerciseDb').innerHTML = `<div class="empty">API Error: ${escapeHtml(e.message)}</div>`;
-  }
-}
+async function searchLiveExercises(forceApi=false){const input=document.getElementById('apiExerciseSearch'),q=(input?.value||'').trim(),box=document.getElementById('exerciseDb');if(!box)return;let rows=EXERCISE_LIBRARY.filter(e=>!q||e.ExerciseName.toLowerCase().includes(q.toLowerCase())||e.PrimaryMuscle.toLowerCase().includes(q.toLowerCase()));if(forceApi&&q){try{const api=await backendApi(API_PROVIDERS.apiNinjas,{name:q});rows=[...rows,...(api||[]).map(x=>({ExerciseName:x.name,PrimaryMuscle:x.muscle,Equipment:x.equipment,Technique:x.instructions,Source:'API'}))]}catch(e){toast('API unavailable, showing local suggestions','warning')}}box.innerHTML=rows.length?`<div class="grid" style="margin-top:0;">${rows.slice(0,18).map(ex=>`<div class="visual-card quarter"><strong style="color:#fff;">${escapeHtml(ex.ExerciseName)}</strong><div class="link-list"><span class="badge info">${escapeHtml(ex.PrimaryMuscle||'Muscle')}</span><span class="badge">${escapeHtml(ex.Equipment||'Equipment')}</span></div><p class="small muted">${escapeHtml(String(ex.Technique||ex.Source||'Suggestion').slice(0,140))}</p><button type="button" class="secondary" onclick="saveSuggestedExercise('${escapeAttr(ex.ExerciseName)}','${escapeAttr(ex.PrimaryMuscle||'')}','${escapeAttr(ex.Equipment||'')}')">Save</button></div>`).join('')}</div>`:'<div class="empty">No exercises found. You can still type manually.</div>'}
+async function saveSuggestedExercise(name,muscle,equipment){await saveToSheet('Exercise_Database',{ExerciseID:uid('EX'),ExerciseName:name,PrimaryMuscle:muscle,Equipment:equipment,Source:'Manual/Suggestion'});toast('Exercise saved to suggestions');loadExerciseSuggestions()}
 
 // 2. Spoonacular Recipe Fetch through backend
 async function searchLiveRecipes() {
@@ -896,6 +810,23 @@ async function fetchLiveYoutubeVideos() {
   }
 }
 
+
+
+/* =========================
+   SMART LOCAL DATABASE + MANUAL HUB OVERRIDES
+========================= */
+const EXERCISE_LIBRARY=[['Bench Press','Chest','Barbell'],['Incline Dumbbell Press','Chest','Dumbbells'],['Push Up','Chest','Bodyweight'],['Lat Pulldown','Back','Cable'],['Pull Up','Back','Bodyweight'],['Barbell Row','Back','Barbell'],['Squat','Legs','Barbell'],['Leg Press','Legs','Machine'],['Romanian Deadlift','Legs','Barbell'],['Shoulder Press','Shoulders','Dumbbells'],['Lateral Raise','Shoulders','Dumbbells'],['Bicep Curl','Arms','Dumbbells'],['Triceps Pushdown','Arms','Cable'],['Plank','Core','Bodyweight'],['Cable Crunch','Core','Cable'],['Deadlift','Full Body','Barbell']].map(([ExerciseName,PrimaryMuscle,Equipment])=>({ExerciseName,PrimaryMuscle,MuscleGroup:PrimaryMuscle,Equipment,Source:'Built-in'}));
+const FOOD_NUTRITION_DB={'chicken breast':{Calories:165,Protein:31,Carbs:0,Fats:3.6,Sugar:0,Fiber:0,Sodium:74,Cholesterol:85,Potassium:256},'egg':{Calories:155,Protein:13,Carbs:1.1,Fats:11,Sugar:1.1,Fiber:0,Sodium:124,Cholesterol:373,Potassium:126},'rice':{Calories:130,Protein:2.7,Carbs:28,Fats:.3,Sugar:.1,Fiber:.4,Sodium:1,Cholesterol:0,Potassium:35},'oats':{Calories:389,Protein:16.9,Carbs:66.3,Fats:6.9,Sugar:1,Fiber:10.6,Sodium:2,Cholesterol:0,Potassium:429},'banana':{Calories:89,Protein:1.1,Carbs:22.8,Fats:.3,Sugar:12.2,Fiber:2.6,Sodium:1,Cholesterol:0,Potassium:358},'milk':{Calories:61,Protein:3.2,Carbs:4.8,Fats:3.3,Sugar:5.1,Fiber:0,Sodium:43,Cholesterol:10,Potassium:150},'greek yogurt':{Calories:59,Protein:10,Carbs:3.6,Fats:.4,Sugar:3.2,Fiber:0,Sodium:36,Cholesterol:5,Potassium:141},'tuna':{Calories:132,Protein:28,Carbs:0,Fats:1,Sugar:0,Fiber:0,Sodium:47,Cholesterol:47,Potassium:237},'salmon':{Calories:208,Protein:20,Carbs:0,Fats:13,Sugar:0,Fiber:0,Sodium:59,Cholesterol:55,Potassium:363},'beef':{Calories:250,Protein:26,Carbs:0,Fats:15,Sugar:0,Fiber:0,Sodium:72,Cholesterol:90,Potassium:318},'potato':{Calories:77,Protein:2,Carbs:17,Fats:.1,Sugar:.8,Fiber:2.2,Sodium:6,Cholesterol:0,Potassium:425},'avocado':{Calories:160,Protein:2,Carbs:8.5,Fats:14.7,Sugar:.7,Fiber:6.7,Sodium:7,Cholesterol:0,Potassium:485},'bread':{Calories:265,Protein:9,Carbs:49,Fats:3.2,Sugar:5,Fiber:2.7,Sodium:491,Cholesterol:0,Potassium:115},'pasta':{Calories:131,Protein:5,Carbs:25,Fats:1.1,Sugar:.8,Fiber:1.8,Sodium:1,Cholesterol:0,Potassium:24}};
+function refreshSuggestionLists(extra=[]){const all=[...EXERCISE_LIBRARY,...(extra||[])],seen=new Set();const dl=document.getElementById('exerciseSuggestions');if(dl)dl.innerHTML=all.filter(e=>e.ExerciseName&&!seen.has(e.ExerciseName.toLowerCase())&&seen.add(e.ExerciseName.toLowerCase())).map(e=>`<option value="${escapeAttr(e.ExerciseName)}"></option>`).join('');const fl=document.getElementById('foodSuggestions');if(fl)fl.innerHTML=Object.keys(FOOD_NUTRITION_DB).map(k=>`<option value="${escapeAttr(k)}"></option>`).join('');}
+async function loadExerciseSuggestions(){try{const saved=await loadFromSheet('Exercise_Database');refreshSuggestionLists(saved.map(e=>({ExerciseName:e.ExerciseName,PrimaryMuscle:e.PrimaryMuscle||e.MuscleGroup,Equipment:e.Equipment})))}catch{refreshSuggestionLists()}}
+function findExerciseMatch(name){const q=String(name||'').toLowerCase().trim();return EXERCISE_LIBRARY.find(e=>e.ExerciseName.toLowerCase()===q)||EXERCISE_LIBRARY.find(e=>e.ExerciseName.toLowerCase().includes(q))}
+function applyExerciseSuggestion(input){const row=input.closest('.exercise-row,.schedule-exercise-row,form'),ex=findExerciseMatch(input.value);if(!row||!ex)return;const m=row.querySelector('[name="MuscleGroup"],[name="PrimaryMuscle"]');if(m&&!m.value)m.value=ex.PrimaryMuscle;const eq=row.querySelector('[name="Equipment"]');if(eq&&!eq.value)eq.value=ex.Equipment;}
+function estimateMealRow(row){const name=String(row.querySelector('[name="FoodName"]')?.value||'').toLowerCase(),grams=Number(row.querySelector('[name="Weight_g"],[name="ServingGrams"]')?.value||100)||100,key=Object.keys(FOOD_NUTRITION_DB).find(k=>name.includes(k));if(!key)return;const src=FOOD_NUTRITION_DB[key],factor=grams/100;['Calories','Protein','Carbs','Fats','Sugar','Fiber','Sodium','Cholesterol','Potassium'].forEach(k=>{const el=row.querySelector(`[name="${k}"],[name="${k}_mg"]`);if(el)el.value=Math.round((src[k]||0)*factor*10)/10});const source=row.querySelector('[name="Source"]');if(source)source.value='Auto estimate: '+key;row.classList.add('auto-estimate')}
+function setLibraryTab(id,btn){document.querySelectorAll('.library-panel').forEach(p=>p.classList.remove('active'));document.getElementById(id)?.classList.add('active');document.querySelectorAll('.library-tabs button').forEach(b=>b.classList.remove('active'));btn?.classList.add('active')}
+async function renderRecipeCards(){const box=document.getElementById('recipeCards');if(!box)return;const r=await loadFromSheet('Recipes');box.innerHTML=r.length?r.slice().reverse().map(x=>`<div class="visual-card third">${x.ImageURL?`<img src="${escapeAttr(x.ImageURL)}" style="width:100%;height:150px;object-fit:cover;border-radius:12px;">`:''}<strong style="color:#fff;">${escapeHtml(x.RecipeName||'Recipe')}</strong><span class="small muted">${escapeHtml(x.Category||'Manual')} · ${escapeHtml(x.MealType||'')}</span><div class="micro-grid" style="grid-template-columns:repeat(2,1fr);"><div class="micro-stat"><strong>${Number(x.Calories||0)}</strong><span class="small muted">kcal</span></div><div class="micro-stat"><strong>${Number(x.Protein||0)}g</strong><span class="small muted">protein</span></div><div class="micro-stat"><strong>${Number(x.Fats||0)}g</strong><span class="small muted">fats</span></div><div class="micro-stat"><strong>${Number(x.Sodium_mg||x.Sodium||0)}mg</strong><span class="small muted">sodium</span></div></div><p class="small muted">${escapeHtml(String(x.Ingredients||'').slice(0,160))}</p></div>`).join(''):'<div class="empty full">No manual recipes saved yet.</div>'}
+async function renderInfluencerCards(){const box=document.getElementById('influencerCards');if(!box)return;const rows=await loadFromSheet('Influencers');box.innerHTML=rows.length?rows.slice().reverse().map(i=>{const links=String(i.Links||'').split(/[\n,]+/).map(x=>x.trim()).filter(Boolean);return `<div class="visual-card third"><strong style="color:#fff;">${escapeHtml(i.SocialMediaName||'Creator')}</strong><div class="link-list"><span class="badge info">${escapeHtml(i.Platform||'Social')}</span><span class="badge">${escapeHtml(i.Niche||'Fitness')}</span><span class="badge warning">${escapeHtml(i.Rating||'')}★</span></div><div class="small muted">${escapeHtml(i.Handle||'')}</div><div class="link-list">${links.map((l,idx)=>`<a href="${escapeAttr(l)}" target="_blank" rel="noopener">Link ${idx+1}</a>`).join('')}</div><p class="small muted">${escapeHtml(i.Notes||'')}</p></div>`}).join(''):'<div class="empty full">No influencers saved yet.</div>'}
+async function renderLibraryHub(){await Promise.all([renderRecipeCards(),renderInfluencerCards(),loadExerciseSuggestions()])}
+async function addInfluencer(e){e.preventDefault();const data=formData(e.target);data.InfluencerID=uid('INF');await saveToSheet('Influencers',data);toast('Influencer saved');e.target.reset();renderInfluencerCards()}
 
 /* =========================
    LOGIN + ACCOUNT SESSION
@@ -1089,16 +1020,9 @@ function nutritionCalculator(){
 ========================= */
 function addExerciseRow(){
   const id=uid('ROW');
-  document.getElementById('exerciseRows').insertAdjacentHTML('beforeend',`<div class="card full exercise-row" data-row="${id}" style="padding:20px; margin:16px 0; background: var(--bg);">
-    <div class="form-grid">
-      <div class="field"><label>Movement</label><input name="ExerciseName" required></div><div class="field"><label>Target Muscle</label><input name="MuscleGroup"></div><div class="field"><label>Apparatus</label><input name="Equipment"></div>
-      <div class="field"><label>Sets</label><input name="Sets" type="number" oninput="rowVolume(this)"></div><div class="field"><label>Reps per set</label><input name="Reps" type="number" oninput="rowVolume(this)"></div><div class="field"><label>Load (kg)</label><input name="WeightUsed" type="number" step="0.5" oninput="rowVolume(this)"></div>
-      <div class="field"><label>RPE</label><input name="RPE" type="number" min="1" max="10"></div><div class="field"><label>Tempo</label><input name="Tempo" placeholder="3-1-1"></div><div class="field"><label>Rest (sec)</label><input name="RestTime" placeholder="90"></div>
-      <div class="field"><label>Superset ID</label><input name="SupersetGroup"></div><div class="field"><label>Drop Set</label><select name="DropSet"><option>No</option><option>Yes</option></select></div><div class="field"><label>Warm-up</label><select name="WarmupSet"><option>No</option><option>Yes</option></select></div>
-      <div class="field"><label>Volume</label><input name="Volume" readonly style="color:var(--brand); background: var(--panel);"></div><div class="field full"><label>Execution Notes</label><input name="Notes"></div>
-    </div><button type="button" class="secondary" style="margin-top:16px; padding: 10px 16px; font-size:0.75rem;" onclick="this.closest('.exercise-row').remove()">Remove Block</button></div>`);
+  document.getElementById('exerciseRows').insertAdjacentHTML('beforeend',`<div class="card full exercise-row" data-row="${id}" style="padding:20px; margin:16px 0; background: var(--bg);"><div class="form-grid"><div class="field"><label>Movement</label><input name="ExerciseName" list="exerciseSuggestions" oninput="applyExerciseSuggestion(this)" required></div><div class="field"><label>Target Muscle</label><input name="MuscleGroup"></div><div class="field"><label>Apparatus</label><input name="Equipment"></div><div class="field"><label>Sets</label><input name="Sets" type="number" oninput="rowVolume(this)"></div><div class="field"><label>Reps per set</label><input name="Reps" placeholder="10 or 12/10/8" oninput="rowVolume(this)"></div><div class="field"><label>Load (kg)</label><input name="WeightUsed" type="number" step="0.5" oninput="rowVolume(this)"></div><div class="field"><label>RPE</label><input name="RPE" type="number" min="1" max="10"></div><div class="field"><label>Tempo</label><input name="Tempo" placeholder="3-1-1"></div><div class="field"><label>Rest (sec)</label><input name="RestTime" placeholder="90"></div><div class="field"><label>Superset ID</label><input name="SupersetGroup"></div><div class="field"><label>Drop Set</label><select name="DropSet"><option>No</option><option>Yes</option></select></div><div class="field"><label>Warm-up</label><select name="WarmupSet"><option>No</option><option>Yes</option></select></div><div class="field"><label>Volume</label><input name="Volume" readonly style="color:var(--brand); background: var(--panel);"></div><div class="field full"><label>Execution Notes</label><input name="Notes"></div></div><button type="button" class="secondary" style="margin-top:16px; padding: 10px 16px; font-size:0.75rem;" onclick="this.closest('.exercise-row').remove()">Remove Block</button></div>`);
 }
-function rowVolume(el){const row=el.closest('.exercise-row');const sets=row.querySelector('[name="Sets"]').value,reps=row.querySelector('[name="Reps"]').value,w=row.querySelector('[name="WeightUsed"]').value;row.querySelector('[name="Volume"]').value=calculateWorkoutVolume(sets,reps,w)}
+function rowVolume(el){const row=el.closest('.exercise-row');const sets=Number(row.querySelector('[name="Sets"]').value||0),repRaw=String(row.querySelector('[name="Reps"]').value||'0'),w=Number(row.querySelector('[name="WeightUsed"]').value||0);const repTotal=repRaw.includes('/')?repRaw.split('/').reduce((a,b)=>a+Number(b||0),0):(Number(repRaw||0)*sets);row.querySelector('[name="Volume"]').value=Math.round(repTotal*w)}
 
 
 
@@ -1159,7 +1083,7 @@ function addScheduleExerciseRow(data={}){
   const setCount = Number(data.Sets || data.SetCount || 3);
   wrap.insertAdjacentHTML('beforeend',`<div class="card full schedule-exercise-row" style="padding:18px; margin:14px 0; background:var(--bg);">
     <div class="form-grid">
-      <div class="field"><label>Exercise</label><input name="ExerciseName" required value="${escapeAttr(data.ExerciseName||'')}"></div>
+      <div class="field"><label>Exercise</label><input name="ExerciseName" list="exerciseSuggestions" oninput="applyExerciseSuggestion(this)" required value="${escapeAttr(data.ExerciseName||'')}"></div>
       <div class="field"><label>Muscle</label><input name="MuscleGroup" value="${escapeAttr(data.MuscleGroup||'')}"></div>
       <div class="field"><label>Equipment</label><input name="Equipment" value="${escapeAttr(data.Equipment||'')}"></div>
       <div class="field"><label>Sets</label><input name="Sets" type="number" min="1" value="${escapeAttr(setCount)}" onchange="setScheduleSetCount(this)"></div>
@@ -1289,17 +1213,10 @@ async function loadScheduleIntoSession(scheduleId){
 function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
 function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;');}
 
-function addMealRow(){
-  document.getElementById('mealRows').insertAdjacentHTML('beforeend',`<div class="card full meal-row" style="padding:20px; margin:16px 0; background: var(--bg);"><div class="form-grid">
-    <div class="field"><label>Date</label><input type="date" name="Date" required></div><div class="field"><label>Type</label><select name="MealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option><option>Pre-workout</option><option>Post-workout</option></select></div><div class="field"><label>Time</label><input name="Time" type="time"></div>
-    <div class="field"><label>Item</label><input name="FoodName" required></div><div class="field"><label>Quantity</label><input name="Quantity"></div><div class="field"><label>Mass (g)</label><input name="Weight_g" type="number"></div>
-    <div class="field"><label>Kcal</label><input name="Calories" type="number"></div><div class="field"><label>Pro (g)</label><input name="Protein" type="number"></div><div class="field"><label>Carb (g)</label><input name="Carbs" type="number"></div>
-    <div class="field"><label>Fat (g)</label><input name="Fats" type="number"></div><div class="field"><label>Sugar (g)</label><input name="Sugar" type="number"></div><div class="field"><label>Fiber (g)</label><input name="Fiber" type="number"></div>
-    <div class="field"><label>Sodium (mg)</label><input name="Sodium" type="number"></div><div class="field"><label>Cholesterol (mg)</label><input name="Cholesterol" type="number"></div><div class="field"><label>Notes</label><input name="Notes"></div>
-  </div><button type="button" class="secondary" style="margin-top:16px; padding: 10px 16px; font-size:0.75rem;" onclick="this.closest('.meal-row').remove()">Remove Item</button></div>`);
-}
+function addMealRow(){const today=new Date().toISOString().slice(0,10);document.getElementById('mealRows').insertAdjacentHTML('beforeend',`<div class="card full meal-row" style="padding:20px; margin:16px 0; background: var(--bg);"><div class="form-grid"><div class="field"><label>Date</label><input type="date" name="Date" value="${today}" required></div><div class="field"><label>Type</label><select name="MealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option><option>Pre-workout</option><option>Post-workout</option></select></div><div class="field"><label>Time</label><input name="Time" type="time"></div><div class="field"><label>Meal / Food</label><input name="FoodName" list="foodSuggestions" oninput="estimateMealRow(this.closest('.meal-row'))" required></div><div class="field"><label>Quantity</label><input name="Quantity" placeholder="1 plate / 1 cup"></div><div class="field"><label>Serving Grams</label><input name="Weight_g" type="number" value="100" oninput="estimateMealRow(this.closest('.meal-row'))"></div><div class="field"><label>Kcal</label><input name="Calories" type="number"></div><div class="field"><label>Pro (g)</label><input name="Protein" type="number"></div><div class="field"><label>Carb (g)</label><input name="Carbs" type="number"></div><div class="field"><label>Fat (g)</label><input name="Fats" type="number"></div><div class="field"><label>Sugar (g)</label><input name="Sugar" type="number"></div><div class="field"><label>Fiber (g)</label><input name="Fiber" type="number"></div><div class="field"><label>Sodium (mg)</label><input name="Sodium" type="number"></div><div class="field"><label>Cholesterol (mg)</label><input name="Cholesterol" type="number"></div><div class="field"><label>Potassium (mg)</label><input name="Potassium" type="number"></div><div class="field"><label>Source</label><input name="Source" readonly placeholder="Auto/manual"></div><div class="field full"><label>Notes</label><input name="Notes"></div></div><button type="button" class="secondary" style="margin-top:16px; padding:10px 16px; font-size:.75rem;" onclick="this.closest('.meal-row').remove()">Remove Item</button></div>`)}
 
-async function handleFormSubmit(e,sheet){e.preventDefault(); const data=formData(e.target); if(sheet==='Users') data.Age=calculateAge(); await saveToSheet(sheet,data); toast('Identity committed to '+sheet); updateDashboard();}
+async function handleFormSubmit(e,sheet){e.preventDefault(); const data=formData(e.target); if(sheet==='Users') data.Age=calculateAge(); await saveToSheet(sheet,data); toast(sheet==='Users'?'Profile saved':'Saved to '+sheet); if(sheet==='Users') toggleProfileEdit(false); updateDashboard();}
+function toggleProfileEdit(enable=true){document.querySelectorAll('#profileForm input:not([name="UserID"]),#profileForm select,#profileForm textarea').forEach(el=>el.disabled=!enable);}
 async function handlePlanSubmit(e){e.preventDefault();const data=formData(e.target);data.PlanID=uid('PLAN');await saveToSheet('Workout_Plans',data);toast('Protocol Saved');e.target.reset();renderPlans();generateWorkoutCalendar();}
 async function handleWorkoutSubmit(e){
   e.preventDefault(); const base=formData(e.target); base.LogID=uid('LOG'); base.Duration_min=document.getElementById('durationOutput').value; 
@@ -1310,8 +1227,10 @@ async function handleWorkoutSubmit(e){
     toast('Telemetry Logged'); e.target.reset(); document.getElementById('exerciseRows').innerHTML=''; addExerciseRow(); updateDashboard();
   } catch(err) { toast('Save Failed: ' + err.message, 'danger'); }
 }
-async function handlePRSubmit(e){e.preventDefault();const data=formData(e.target);data.PRID=uid('PR');data.Estimated1RM=calculate1RM(data.Weight,data.Reps).toFixed(1);const prs=await loadFromSheet('PR_History');const prev=prs.filter(p=>p.Exercise===data.Exercise).sort((a,b)=>Number(b.Estimated1RM)-Number(a.Estimated1RM))[0];data.PreviousPR=prev?.Estimated1RM||0;data.Change=(Number(data.Estimated1RM)-Number(data.PreviousPR)).toFixed(1);await saveToSheet('PR_History',data);toast('Milestone Registered');e.target.reset();updateDashboard();}
-async function handleMealSubmit(e){e.preventDefault();const rows=[...document.querySelectorAll('.meal-row')].map(r=>{const o={};r.querySelectorAll('input,select').forEach(i=>o[i.name]=i.value);return {...o,MealID:uid('MEAL'),UserID:USER_ID}});for(const row of rows) await saveToSheet('Nutrition_Logs',row);toast('Nutrition committed');document.getElementById('mealRows').innerHTML='';addMealRow();updateDashboard();}
+async function handlePRSubmit(e){e.preventDefault();const data=formData(e.target);data.PRID=uid('PR');data.Estimated1RM=calculate1RM(data.Weight,data.Reps).toFixed(1);const prs=await loadFromSheet('PR_History');const prev=prs.filter(p=>p.Exercise===data.Exercise && String(p.WorkoutType||'')===String(data.WorkoutType||'')).sort((a,b)=>Number(b.Estimated1RM)-Number(a.Estimated1RM))[0];data.PreviousPR=prev?.Estimated1RM||0;data.Change=(Number(data.Estimated1RM)-Number(data.PreviousPR)).toFixed(1);await saveToSheet('PR_History',data);toast('Workout-wise milestone registered');e.target.reset();updateDashboard();}
+async function handleMealSubmit(e){e.preventDefault();const rows=[...document.querySelectorAll('.meal-row')].map(r=>{estimateMealRow(r);const o={};r.querySelectorAll('input,select,textarea').forEach(i=>o[i.name]=i.value);return {...o,NutritionID:uid('NUT'),MealID:uid('MEAL'),UserID:USER_ID}});for(const row of rows) await saveToSheet('Nutrition_Logs',row);toast('Nutrition committed with micro nutrients');document.getElementById('mealRows').innerHTML='';addMealRow();
+  loadExerciseSuggestions();
+  renderLibraryHub();updateDashboard();}
 async function handleSleepSubmit(e){e.preventDefault();const data=formData(e.target);data.SleepID=uid('SLEEP');data.DurationHours=document.getElementById('sleepDuration').value;await saveToSheet('Sleep_Logs',data);toast('Sleep cycle stored');e.target.reset();updateDashboard();}
 async function handleWaterSubmit(e){e.preventDefault();const data=formData(e.target);data.WaterID=uid('WATER');await saveToSheet('Water_Logs',data);toast('Hydration logged');e.target.reset();updateDashboard();}
 async function handleRecoverySubmit(e){e.preventDefault();const data=formData(e.target);data.RecoveryID=uid('RECOV');const latestSleep=(await loadFromSheet('Sleep_Logs')).at(-1)||{};data.SleepDuration=latestSleep.DurationHours;data.SleepQuality=latestSleep.SleepQuality;data.RecoveryScore=calculateRecoveryScore(data);data.DeloadRecommendation=data.RecoveryScore<60?'Recommended':'Not required';data.OvertrainingRisk=data.RecoveryScore<60?'High':data.RecoveryScore<80?'Moderate':'Low';await saveToSheet('Recovery_Logs',data);toast('Readiness computed');e.target.reset();updateDashboard();}
@@ -1361,13 +1280,14 @@ async function updateDashboard(){
   document.getElementById('recoveryDashboard').innerHTML = recovery.length ? recovery.slice(-3).reverse().map(r=>`<div class="notice" style="border-left: 4px solid ${r.RecoveryScore>60?'var(--accent)':'var(--danger)'}"><strong>${r.Date}: ${r.RecoveryScore}/100 - ${r.OvertrainingRisk} Risk</strong><span class="muted small" style="margin-top:6px;">Action: ${r.DeloadRecommendation==='Recommended'?'Execute deload protocol immediately.':'Progression authorized.'}</span></div>`).join('') : '<div class="empty">No recovery telemetry detected.</div>';
 
   renderWorkoutHistory(logs); renderPRHistory(prs); renderMealHistory(meals); renderCharts(exs,logs,prs,body); renderMuscleHeatmap(exs); runActionableIntelligence({logs,exs,meals,sleeps,waters,recovery});
-  renderPlans(); renderMonthlyReport(); 
+  renderPlans(); renderMonthlyReport(); renderLibraryHub(); 
 }
 
 function avg(arr){arr=arr.filter(Boolean);return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0}
 function renderWorkoutHistory(logs){document.getElementById('workoutHistory').innerHTML=logs.length?table(['Date','Scheduled','Actual','Status','Duration'],logs.slice(-10).reverse().map(l=>[l.Date,l.ScheduledWorkout,l.ActualWorkout,l.Status,l.Duration_min])):'<div class="empty">No execution logs yet.</div>'}
-function renderPRHistory(prs){document.getElementById('prHistory').innerHTML=prs.length?table(['Movement','Date','Load','Reps','1RM','Delta'],prs.slice(-10).reverse().map(p=>[p.Exercise,p.Date,p.Weight,p.Reps,p.Estimated1RM,p.Change])):'<div class="empty">No milestones registered.</div>'}
-function renderMealHistory(meals){document.getElementById('mealHistory').innerHTML=meals.length?table(['Date','Type','Item','Kcal','Pro'],meals.slice(-12).reverse().map(m=>[m.Date,m.MealType,m.FoodName,m.Calories,m.Protein])):'<div class="empty">No intake logged.</div>'}
+function renderPRHistory(prs){renderPRDashboard(prs)}
+function renderMealHistory(meals){document.getElementById('mealHistory').innerHTML=meals.length?table(['Date','Type','Item','Kcal','Pro','Fats','Sugar','Fiber','Sodium'],meals.slice(-12).reverse().map(m=>[m.Date,m.MealType,m.FoodName,m.Calories,m.Protein,m.Fats,m.Sugar,m.Fiber,m.Sodium||m.Sodium_mg])):'<div class="empty">No intake logged.</div>'}
+function renderPRDashboard(data){const prs=data||window.__LATEST_PRS||[];window.__LATEST_PRS=prs;const sel=document.getElementById('prWorkoutFilter');if(sel){const current=sel.value||'All';const types=['All',...new Set(prs.map(p=>p.WorkoutType||'Uncategorized'))];sel.innerHTML=types.map(t=>`<option ${t===current?'selected':''}>${escapeHtml(t)}</option>`).join('');}const filter=sel?.value||'All';const rows=filter==='All'?prs:prs.filter(p=>(p.WorkoutType||'Uncategorized')===filter);document.getElementById('prHistory').innerHTML=rows.length?table(['Workout','Movement','Date','Load','Reps','1RM','Delta'],rows.slice(-20).reverse().map(p=>[p.WorkoutType||'Uncategorized',p.Exercise,p.Date,p.Weight,p.Reps,p.Estimated1RM,p.Change])):'<div class="empty">No milestones for this workout.</div>';chart('prChart','line',{labels:rows.map(p=>p.Date).slice(-10),datasets:[{label:(filter==='All'?'All Workouts':filter)+' 1RM',data:rows.map(p=>p.Estimated1RM).slice(-10),borderColor:'#10B981',tension:0.4}]});}
 function table(headers,rows){return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c??''}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
 async function renderPlans(){const plans=await loadFromSheet('Workout_Plans');document.getElementById('plansTable').innerHTML=plans.length?table(['Protocol','Initiation','Architecture','Active'],plans.slice().reverse().map(p=>[p.SplitName,p.StartDate,p.PatternType,p.IsActive])):'<div class="empty">No active protocols.</div>'}
 
@@ -1404,8 +1324,8 @@ function calculateSplitBasedStreak(logs){let streak=0;logs.slice().reverse().for
 ========================= */
 function openModal(id){document.getElementById(id).classList.add('active')}
 function closeModal(id){document.getElementById(id).classList.remove('active')}
-async function addExerciseToDatabase(e){e.preventDefault();const data=formData(e.target);data.ExerciseID=uid('EX');await saveToSheet('Exercise_Database',data);toast('Movement Registered');closeModal('exerciseModal');e.target.reset();}
-async function addRecipe(e){e.preventDefault();const data=formData(e.target);data.RecipeID=uid('REC');await saveToSheet('Recipes',data);toast('Formulation stored');closeModal('recipeModal');e.target.reset();}
+async function addExerciseToDatabase(e){e.preventDefault();const data=formData(e.target);data.ExerciseID=uid('EX');await saveToSheet('Exercise_Database',data);toast('Movement Registered');closeModal('exerciseModal');e.target.reset();loadExerciseSuggestions();searchLiveExercises();}
+async function addRecipe(e){e.preventDefault();const data=formData(e.target);data.RecipeID=uid('REC');await saveToSheet('Recipes',data);toast('Manual recipe saved');e.target.reset();renderRecipeCards();}
 
 /* =========================
    CHARTS + HEATMAPS
@@ -1423,22 +1343,10 @@ function renderCharts(exs,logs,prs,body){
   const muscles={}; exs.forEach(e=>muscles[e.MuscleGroup||'Other']=(muscles[e.MuscleGroup||'Other']||0)+Number(e.Sets||0));
   chart('muscleChart','doughnut',{labels:Object.keys(muscles),datasets:[{data:Object.values(muscles),backgroundColor:['#8B5CF6','#3B82F6','#10B981','#F59E0B','#EF4444','#EC4899'], borderWidth:0}]},{cutout:'70%'});
   
-  chart('prChart','line',{labels:prs.map(p=>p.Date).slice(-10),datasets:[{label:'Est. 1RM Trajectory',data:prs.map(p=>p.Estimated1RM).slice(-10),borderColor:'#10B981',tension:0.4}]});
+  renderPRDashboard(prs);
   chart('bodyChart','line',{labels:body.map(b=>b.Date).slice(-10),datasets:[{label:'Mass',data:body.map(b=>b.Weight).slice(-10),borderColor:'#F59E0B',tension:0.4}]});
 }
-function renderMuscleHeatmap(exs=[]){
-  const counts={};exs.forEach(e=>counts[e.MuscleGroup||e.PrimaryMuscle||'Other']=(counts[e.MuscleGroup||e.PrimaryMuscle||'Other']||0)+Number(e.Sets||0));
-  const color=m=>{const v=counts[m]||0;return v>12?'#EF4444':v>6?'#F59E0B':v>0?'#10B981':'#27272a'};
-  document.getElementById('muscleHeatmap').innerHTML=`<svg viewBox="0 0 220 360" role="img">
-    <circle cx="110" cy="42" r="24" fill="#27272a"/>
-    <rect class="muscle-group" x="78" y="70" width="64" height="70" rx="20" fill="${color('Chest')}"><title>Chest / Back (${counts['Chest']||0} sets)</title></rect>
-    <rect class="muscle-group" x="56" y="78" width="35" height="110" rx="16" fill="${color('Shoulders')}"><title>Shoulders / Arms</title></rect>
-    <rect class="muscle-group" x="129" y="78" width="35" height="110" rx="16" fill="${color('Arms')}"><title>Arms</title></rect>
-    <rect class="muscle-group" x="84" y="140" width="52" height="62" rx="16" fill="${color('Core')}"><title>Core</title></rect>
-    <rect class="muscle-group" x="72" y="205" width="34" height="110" rx="16" fill="${color('Legs')}"><title>Legs</title></rect>
-    <rect class="muscle-group" x="114" y="205" width="34" height="110" rx="16" fill="${color('Legs')}"><title>Legs</title></rect>
-  </svg>`;
-}
+function renderMuscleHeatmap(exs=[]){const counts={};exs.forEach(e=>{const m=e.MuscleGroup||e.PrimaryMuscle||inferMuscleFromExercise(e.ExerciseName)||'Other';counts[m]=(counts[m]||0)+Number(e.Sets||1)});const max=Math.max(1,...Object.values(counts));const color=m=>{const v=counts[m]||0,t=v/max;return v===0?'#27272a':t>.66?'#ef4444':t>.33?'#f59e0b':'#10b981'};const label=m=>`${m}: ${counts[m]||0} sets`;const box=document.getElementById('muscleHeatmap');box.classList.add('real-human');box.innerHTML=`<div class="heatmap-shell"><svg viewBox="0 0 260 420" role="img"><ellipse cx="130" cy="34" rx="24" ry="28" fill="#3f3f46"/><path d="M102 68 Q130 92 158 68 L174 144 Q170 196 150 220 L110 220 Q90 196 86 144 Z" fill="${color('Chest')}"><title>${label('Chest')}</title></path><path d="M96 78 Q72 92 62 130 L52 206 Q50 228 66 232 Q82 230 82 208 L88 146 Q92 118 108 96 Z" fill="${color('Shoulders')}"><title>${label('Shoulders')}</title></path><path d="M164 78 Q188 92 198 130 L208 206 Q210 228 194 232 Q178 230 178 208 L172 146 Q168 118 152 96 Z" fill="${color('Arms')}"><title>${label('Arms')}</title></path><path d="M106 122 L154 122 L150 218 L110 218 Z" fill="${color('Core')}"><title>${label('Core')}</title></path><path d="M108 222 Q92 272 86 352 Q86 386 106 386 Q120 382 121 352 L128 236 Z" fill="${color('Legs')}"><title>${label('Legs')}</title></path><path d="M152 222 Q168 272 174 352 Q174 386 154 386 Q140 382 139 352 L132 236 Z" fill="${color('Legs')}"><title>${label('Legs')}</title></path><path d="M98 78 Q130 104 162 78" fill="none" stroke="${color('Back')}" stroke-width="12" stroke-linecap="round"><title>${label('Back')}</title></path></svg><div class="heatmap-list">${['Chest','Back','Shoulders','Arms','Core','Legs'].map(m=>`<div><span>${m}</span><strong style="color:${color(m)}">${counts[m]||0} sets</strong></div>`).join('')}<p class="small muted">Heatmap uses your logged workout exercise rows. Grey means no sets logged yet.</p></div></div>`}function inferMuscleFromExercise(name=''){const ex=findExerciseMatch(name);return ex?.PrimaryMuscle||''}
 
 /* =========================
    INTELLIGENCE + ACHIEVEMENTS
