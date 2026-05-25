@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniFit Tracker AI</title>
+    <style>
+        /* --- CSS ARCHITECTURE --- */
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-dark: #111827;
+            --card-bg: #1F2937;
+            --text-light: #F9FAFB;
+            --text-muted: #9CA3AF;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --border: #374151;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        /* Sidebar */
+        nav {
+            width: 260px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        nav h2 { color: var(--primary); margin-top: 0; font-size: 1.5rem; }
+        .nav-links { list-style: none; padding: 0; margin-top: 30px; }
+        .nav-links li { 
+            margin: 12px 0; padding: 10px 15px; border-radius: 8px;
+            cursor: pointer; color: var(--text-muted); transition: all 0.2s;
+        }
+        .nav-links li:hover, .nav-links li.active { 
+            background: rgba(79, 70, 229, 0.1); color: var(--primary); font-weight: 600; 
+        }
+        
+        /* Main Content */
+        main {
+            margin-left: 260px;
+            padding: 30px;
+            width: calc(100% - 260px);
+            box-sizing: border-box;
+        }
+        
+        /* Layouts & Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card-title { margin-top: 0; font-size: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .metric { font-size: 2.2rem; font-weight: 700; margin: 10px 0; }
+        
+        /* Forms */
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; color: var(--text-light); font-size: 0.9rem; }
+        input, select, textarea {
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--bg-dark); color: white; box-sizing: border-box; font-family: inherit;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        button {
+            background: var(--primary); color: white; padding: 12px 24px;
+            border: none; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%;
+            transition: background 0.2s;
+        }
+        button:hover { background: var(--primary-hover); }
+        button.secondary { background: var(--border); color: var(--text-light); }
+        button.secondary:hover { background: #4B5563; }
+        
+        /* Notifications & AI Alerts */
+        .ai-notice {
+            background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--warning);
+            padding: 16px; margin-bottom: 24px; border-radius: 0 8px 8px 0; display: none;
+        }
+        .ai-notice strong { color: var(--warning); }
+        
+        .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Dynamic Lists */
+        .dynamic-list-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h2>OmniFit Tracker</h2>
+        <ul class="nav-links">
+            <li onclick="switchTab('view-dashboard')" class="active">Main Dashboard</li>
+            <li onclick="switchTab('view-profile')">User Profile</li>
+            <li onclick="switchTab('view-workout')">Log Workout</li>
+            <li onclick="switchTab('view-nutrition')">Nutrition & Meals</li>
+            <li onclick="switchTab('view-recovery')">Recovery & Sleep</li>
+            <li onclick="switchTab('view-prs')">Personal Records</li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="ai-notice" id="global-ai-notice">
+            <strong>Omni AI Insight:</strong> <span id="ai-notice-text">Analyzing recent data...</span>
+        </div>
+
+        <section id="view-dashboard" class="view-section active">
+            <h1>30-Day Journey Overview</h1>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 class="card-title">Workout Consistency</h3>
+                    <div class="metric" id="dash-consistency">87%</div>
+                    <p style="color: var(--success); font-size: 0.85rem; margin:0;">Consistent with 3-on-1-off split</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Recovery Score</h3>
+                    <div class="metric" id="dash-recovery" style="color: var(--warning);">72/100</div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin:0;">HRV dipped slightly yesterday</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Current Split</h3>
+                    <div class="metric">Push Day</div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin:0;">Upcoming: Pull Day</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Daily Nutrition</h3>
+                    <div class="metric" style="font-size: 1.5rem; margin-top: 20px;">
+                        <span style="color:var(--primary)">145g</span> Pro / 
+                        <span style="color:var(--success)">220g</span> Carb / 
+                        <span style="color:var(--warning)">65g</span> Fat
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin:0; margin-top: 10px;">2,100 / 2,500 kcal</p>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 class="card-title">Recent Intelligence Notices</h3>
+                    <ul style="padding-left: 20px; color: var(--text-muted);">
+                        <li>Protein intake was low on Tuesday.</li>
+                        <li>Chest volume increased by 10% this week.</li>
+                        <li>Sleep consistency is strong (Average 7.5 hrs).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-profile" class="view-section">
+            <h1>User Profile & Body Data</h1>
+            <div class="card">
+                <form id="profileForm" onsubmit="handleFormSubmit(event, 'Users')">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="FullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sex / Gender</label>
+                            <select name="Sex">
+                                <option>Male</option><option>Female</option><option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Height (cm)</label>
+                            <input type="number" name="Height_cm" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Weight (kg)</label>
+                            <input type="number" name="Weight_kg" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Birthday</label>
+                            <input type="date" name="DOB" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Primary Goal</label>
+                            <select name="Goal">
+                                <option>Fat loss / Cutting</option>
+                                <option>Lean bulk</option>
+                                <option>Bodybuilding prep</option>
+                                <option>Strength training prep</option>
+                                <option>General fitness</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit">Update Profile</button>
+                    <p class="form-status" style="display:none; color: var(--success); margin-top: 10px;">Profile saved!</p>
+                </form>
+            </div>
+        </section>
+
+        <section id="view-workout" class="view-section">
+            <h1>Log Workout Schedule</h1>
+            <div class="card">
+                <form id="workoutForm" onsubmit="handleFormSubmit(event, 'Workout_Logs')">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Workout Date</label>
+                            <input type="date" name="Date" id="workoutDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Schedule/Split Name</label>
+                            <input type="text" name="ScheduleName" placeholder="e.g., Upper Body" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Start Time</label>
+                            <input type="time" name="StartTime" id="startTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label>End Time</label>
+                            <input type="time" name="EndTime" id="endTime" required onchange="calculateDuration()">
+                        </div>
+                        <div class="form-group">
+                            <label>Auto-Duration (Mins)</label>
+                            <input type="number" name="Duration_min" id="durationCalc" readonly style="background: var(--bg-dark); color: var(--text-muted);">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Workout Status</label>
+                        <select name="Status">
+                            <option value="Completed">Completed</option>
+                            <option value="Skipped">Skipped / Missed</option>
+                            <option value="Moved">Delayed / Moved</option>
+                        </select>
+                    </div>
+
+                    <h3 class="card-title" style="margin-top: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Exercises Performed</h3>
+                    <div id="exercise-container">
+                        </div>
+                    <div class="form-row">
+                        <button type="button" class="secondary" onclick="addExerciseRow()">+ Add Exercise</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes / Missed Reason</label>
+                        <textarea name="Notes" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit">Save Workout to Logs</button>
+                    <p class="form-status" style="display:none; color: var(--success); margin-top: 10px;">Workout logged!</p>
+                </form>
+            </div>
+        </section>
+
+        <section id="view-nutrition" class="view-section">
+            <h1>Nutrition & Meal Logs</h1>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 class="card-title">Macro Calculator</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Auto-calculated based on Profile Weight & Goal.</p>
+                    <div class="metric" id="target-cals">2,450 kcal</div>
+                    <p>Target Protein: <strong>160g</strong></p>
+                    <p>Target Carbs: <strong>250g</strong></p>
+                    <p>Target Fats: <strong>65g</strong></p>
+                </div>
+
+                <div class="card" style="grid-column: span 2;">
+                    <h3 class="card-title">Log a Meal</h3>
+                    <form id="nutritionForm" onsubmit="handleFormSubmit(event, 'Nutrition_Logs')">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" name="Date" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Meal Type</label>
+                                <select name="MealType">
+                                    <option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Food Item / Recipe Name</label>
+                            <input type="text" name="FoodName" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Calories</label><input type="number" name="Calories" required></div>
+                            <div class="form-group"><label>Protein (g)</label><input type="number" name="Protein" required></div>
+                            <div class="form-group"><label>Carbs (g)</label><input type="number" name="Carbs" required></div>
+                            <div class="form-group"><label>Fats (g)</label><input type="number" name="Fats" required></div>
+                        </div>
+                        <button type="submit">Log Meal</button>
+                        <p class="form-status" style="display:none; color: var(--success); margin-top: 10px;">Meal logged!</p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-recovery" class="view-section">
+            <h1>Recovery & Sleep Tracker</h1>
+            <div class="card">
+                <form id="recoveryForm" onsubmit="handleFormSubmit(event, 'Recovery_Sleep')">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" name="Date" required>
+                        </div>
+                    </div>
+                    <h3 class="card-title" style="margin-top: 10px;">Sleep Data</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Sleep Start Time</label>
+                            <input type="time" name="SleepStart" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Wake-Up Time</label>
+                            <input type="time" name="SleepEnd" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sleep Quality (1-10)</label>
+                            <input type="number" name="SleepQuality" min="1" max="10" required>
+                        </div>
+                    </div>
+
+                    <h3 class="card-title" style="margin-top: 10px;">Recovery Data</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Soreness Level (1-10)</label>
+                            <input type="number" name="Soreness" min="1" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Stress Level (1-10)</label>
+                            <input type="number" name="Stress" min="1" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Resting HR (bpm)</label>
+                            <input type="number" name="RHR">
+                        </div>
+                    </div>
+                    <button type="submit">Save Recovery Log</button>
+                    <p class="form-status" style="display:none; color: var(--success); margin-top: 10px;">Recovery data logged!</p>
+                </form>
+            </div>
+        </section>
+
+        <section id="view-prs" class="view-section">
+            <h1>Personal Records (PRs)</h1>
+            <div class="card">
+                <form id="prForm" onsubmit="handleFormSubmit(event, 'PR_History')">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Exercise Name</label>
+                            <input type="text" name="Exercise" placeholder="e.g., Barbell Squat" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Date Achieved</label>
+                            <input type="date" name="Date" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Weight Lifted (kg)</label>
+                            <input type="number" name="Weight" id="prWeight" required onkeyup="calc1RM()">
+                        </div>
+                        <div class="form-group">
+                            <label>Reps Completed</label>
+                            <input type="number" name="Reps" id="prReps" required onkeyup="calc1RM()">
+                        </div>
+                        <div class="form-group">
+                            <label>Estimated 1RM (Epley)</label>
+                            <input type="number" id="calc1RM_result" readonly style="background: var(--bg-dark); color: var(--primary); font-weight: bold;">
+                        </div>
+                    </div>
+                    <button type="submit">Save PR</button>
+                    <p class="form-status" style="display:none; color: var(--success); margin-top: 10px;">PR Saved!</p>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // CONFIGURATION
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4AnVbFlPPgWOK0I-N7TldTj0AP5w-1nKCJh-tIZNlXQushsmdJdYgM5V1as7K3RQ7yQ/exec'; // Replace with actual Google Web App URL
+        const MOCK_MODE = true; // Set to false to actually ping Google Sheets
+
+        // 1. Navigation Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-links li').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Set today's date dynamically on forms when tabs open
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('input[type="date"]').forEach(el => {
+                if(!el.value) el.value = today;
+            });
+        }
+
+        // 2. Actionable Intelligence System
+        function runIntelligenceEngine() {
+            // In production, this would fetch data from Sheets first.
+            // Simulating AI analysis logic:
+            const noticeBox = document.getElementById('global-ai-notice');
+            const noticeText = document.getElementById('ai-notice-text');
+            
+            const mockRecoveryScore = 72; // Mock fetched data
+            const mockProteinIntake = 110; // Mock fetched data (Target: 160)
+            
+            let issues = [];
+            
+            if (mockProteinIntake < 140) {
+                issues.push("Protein intake was low yesterday. Risk: Slower muscle recovery. Action: Prioritize a high-protein breakfast.");
+            }
+            if (mockRecoveryScore < 75) {
+                issues.push("Recovery score is declining. Risk: Overtraining. Action: Ensure you take your scheduled rest day tomorrow.");
+            }
+            
+            if (issues.length > 0) {
+                noticeBox.style.display = "block";
+                noticeText.innerHTML = issues.join('<br><br><strong>Omni AI Insight:</strong> ');
+            }
+        }
+
+        // 3. Form Submission to Google Sheets
+        async function handleFormSubmit(e, sheetName) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = form.querySelector('button[type="submit"]');
+            const statusMsg = form.querySelector('.form-status');
+            const originalText = btn.innerText;
+            
+            btn.innerText = "Saving to Database...";
+            btn.disabled = true;
+
+            // Extract form data into an array based on input names
+            const formData = new FormData(form);
+            let rowValues = ["USER_001"]; // Inject UserID automatically
+            for (let [key, value] of formData.entries()) {
+                rowValues.push(value);
+            }
+
+            const payload = {
+                action: "log",
+                sheet: sheetName,
+                values: rowValues
+            };
+
+            if (MOCK_MODE) {
+                // Simulate network request
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    statusMsg.style.display = "block";
+                    setTimeout(() => statusMsg.style.display = "none", 3000);
+                    form.reset();
+                }, 800);
+            } else {
+                try {
+                    await fetch(APP_SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    statusMsg.style.display = "block";
+                    setTimeout(() => statusMsg.style.display = "none", 3000);
+                    form.reset();
+                } catch (err) {
+                    console.error("Submission Error:", err);
+                    btn.innerText = "Error - Try Again";
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // 4. Calculations Logic
+        function calculateDuration() {
+            const startStr = document.getElementById('startTime').value;
+            const endStr = document.getElementById('endTime').value;
+            if(!startStr || !endStr) return;
+
+            const start = new Date(`1970-01-01T${startStr}Z`);
+            const end = new Date(`1970-01-01T${endStr}Z`);
+            let diff = (end - start) / 1000 / 60; // Minutes
+            if (diff < 0) diff += 24 * 60; // Handle midnight crossover
+            
+            document.getElementById('durationCalc').value = diff;
+        }
+
+        function calc1RM() {
+            const weight = parseFloat(document.getElementById('prWeight').value);
+            const reps = parseFloat(document.getElementById('prReps').value);
+            const resultBox = document.getElementById('calc1RM_result');
+            
+            if (weight > 0 && reps > 0) {
+                // Epley Formula: 1RM = weight * (1 + reps/30)
+                let oneRepMax = reps === 1 ? weight : weight * (1 + (reps / 30));
+                resultBox.value = Math.round(oneRepMax * 10) / 10; // Round to 1 decimal
+            } else {
+                resultBox.value = "";
+            }
+        }
+
+        // 5. Dynamic Exercise UI Builder
+        let exerciseCount = 0;
+        function addExerciseRow() {
+            exerciseCount++;
+            const container = document.getElementById('exercise-container');
+            const row = document.createElement('div');
+            row.className = 'dynamic-list-item';
+            row.innerHTML = `
+                <div class="form-row" style="margin-bottom:0;">
+                    <div class="form-group" style="flex: 2;">
+                        <input type="text" name="Exercise_${exerciseCount}" placeholder="Exercise Name (e.g. Bench Press)" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="Sets_${exerciseCount}" placeholder="Sets" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="Reps_${exerciseCount}" placeholder="Reps (e.g. 10,8,8)" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="Weight_${exerciseCount}" placeholder="Weight (e.g. 60kg)">
+                    </div>
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
+        // INIT
+        window.onload = () => {
+            runIntelligenceEngine();
+            addExerciseRow(); // Add first default exercise row to log
+        };
+    </script>
+</body>
+</html>
