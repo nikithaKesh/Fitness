@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zono Fitness — Premium Tracker</title>
+  <title>FITNESS — Premium Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* --- MODERN ZONO FITNESS UI (MATTE BLACK & BLUE) --- */
+    /* --- FITNESS UI — CLEAN MODERN SYSTEM --- */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;700&display=swap');
     
     :root {
@@ -179,6 +179,37 @@
     .muscle-group { transition: 0.2s; cursor: pointer; stroke: var(--panel); stroke-width: 2; }
     .muscle-group:hover { filter: brightness(1.2); }
 
+
+
+    /* --- CLEANER MODERN UX LAYER --- */
+    .app { background: linear-gradient(135deg, rgba(59,130,246,.04), transparent 28%), var(--bg); }
+    aside::-webkit-scrollbar, .modal-box::-webkit-scrollbar { width: 8px; }
+    aside::-webkit-scrollbar-thumb, .modal-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+    .topbar { gap: 16px; }
+    .topbar .toolbar { align-items: center; }
+    .card { backdrop-filter: blur(10px); animation: softIn .28s ease both; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 16px 45px rgba(0,0,0,.28); }
+    @keyframes softIn { from { opacity: 0; transform: translateY(8px) scale(.995); } to { opacity: 1; transform: none; } }
+    .section-tabs { display: inline-flex; padding: 4px; gap: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 999px; flex-wrap: wrap; }
+    .section-tabs button { border-radius: 999px; background: transparent; border: 0; padding: 9px 14px; color: var(--muted); }
+    .section-tabs button.active { background: var(--brand); color: white; }
+    .routine-card { display: grid; gap: 12px; padding: 18px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
+    .routine-card:hover { border-color: rgba(59,130,246,.6); }
+    .routine-head { display:flex; align-items:flex-start; justify-content:space-between; gap: 12px; }
+    .routine-meta { display:flex; gap: 8px; flex-wrap: wrap; }
+    .exercise-pill-list { display:flex; flex-wrap:wrap; gap:8px; }
+    .exercise-pill-list span { border:1px solid var(--border); border-radius:999px; padding:6px 10px; color:var(--soft); background:var(--panel); font-size:.78rem; }
+    .empty.compact { padding: 24px 18px; }
+    .table-wrap { width: 100%; overflow-x: auto; }
+    .toolbar input, .toolbar select { min-width: 150px; }
+    @media(max-width: 720px) {
+      main { padding: 18px 16px 48px; }
+      .topbar { margin: -18px -16px 18px; padding: 14px 16px; align-items:flex-start; flex-direction:column; }
+      .calendar { grid-template-columns: 1fr; }
+      table { min-width: 720px; }
+      .routine-head { flex-direction:column; }
+    }
+
     @media(max-width: 1080px) {
       .app { grid-template-columns: 1fr; }
       aside { position: fixed; left: -300px; width: 280px; transition: left 0.3s ease; }
@@ -194,18 +225,18 @@
 <div class="app" id="appShell">
   <aside>
     <div class="brand">
-      <div class="logo">ZF</div>
-      <div><h1>Zono Fitness</h1><p>Pro Tracking OS</p></div>
+      <div class="logo">F</div>
+      <div><h1>FITNESS</h1><p>Training OS</p></div>
     </div>
     <div class="nav-search">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input id="navSearch" placeholder="Search OS..." oninput="filterNav(this.value)">
+      <input id="navSearch" placeholder="Search..." oninput="filterNav(this.value)">
     </div>
     <div id="navList"></div>
     <div class="card full" style="margin-top: 24px; padding: 16px; border-radius: var(--radius2); background: var(--bg);">
       <div class="small muted" style="margin-bottom: 8px;">Database Status</div>
       <div class="statline" style="margin: 0;">
-        <strong style="font-size: 0.85rem; color: #fff;">LIVE SYNC</strong>
+        <strong style="font-size: 0.85rem; color: #fff;">SHEETS SYNC</strong>
         <span class="badge success">Connected</span>
       </div>
     </div>
@@ -321,6 +352,48 @@
           </form>
         </div>
         <div class="card half"><h3>Protocol History</h3><div id="plansTable" class="empty">System pending protocol data.</div></div>
+      </div>
+    </section>
+
+
+
+    <section id="schedules" class="page">
+      <div class="grid">
+        <div class="card full">
+          <div class="statline">
+            <div>
+              <h3>Workout Schedule Library</h3>
+              <p class="muted small" style="margin:0;">Store your current routine and all old routines with workout names, sets, reps, rest, tempo, load, and notes.</p>
+            </div>
+            <div class="section-tabs" id="scheduleFilterTabs">
+              <button type="button" class="active" onclick="setScheduleFilter('All', this)">All</button>
+              <button type="button" onclick="setScheduleFilter('Current', this)">Current</button>
+              <button type="button" onclick="setScheduleFilter('Old', this)">Old</button>
+            </div>
+          </div>
+          <div id="scheduleLibrary" class="grid" style="margin-top:0;"><div class="empty compact full">Loading schedules from spreadsheet...</div></div>
+        </div>
+
+        <div class="card full">
+          <h3>Add / Import Workout Schedule</h3>
+          <form id="scheduleForm" onsubmit="handleScheduleSubmit(event)">
+            <div class="form-grid">
+              <div class="field"><label>Schedule Name</label><input name="ScheduleName" required placeholder="e.g. Current Push Day / Old Bulk Routine"></div>
+              <div class="field"><label>Schedule Type</label><select name="ScheduleType"><option>Current</option><option>Old</option></select></div>
+              <div class="field"><label>Workout Name / Day</label><input name="WorkoutDayName" required placeholder="e.g. Push, Pull, Legs, Upper"></div>
+              <div class="field"><label>Phase / Goal</label><input name="PhaseName" placeholder="e.g. Cut, Lean Bulk, Strength"></div>
+              <div class="field"><label>Start Date</label><input type="date" name="StartDate"></div>
+              <div class="field"><label>End Date</label><input type="date" name="EndDate"></div>
+              <div class="field full"><label>Schedule Notes</label><input name="Notes" placeholder="Why you used this schedule, what changed, injuries, focus areas..."></div>
+            </div>
+            <h3 style="margin-top: 28px; border-top: 1px solid var(--border); padding-top: 22px;">Exercises inside this schedule</h3>
+            <div id="scheduleExerciseRows"></div>
+            <div class="toolbar" style="margin-top:16px;">
+              <button type="button" class="secondary" onclick="addScheduleExerciseRow()">Add Exercise</button>
+              <button>Save Schedule to Spreadsheet</button>
+            </div>
+          </form>
+        </div>
       </div>
     </section>
 
@@ -610,22 +683,33 @@
 
 <script>
 /* =========================
-   HARDCODED BACKEND CONFIG 
+   PERMANENT BACKEND BINDING
 ========================= */
-// Completely removed mock mode & config tab. Bound permanently to your backend.
+// No config panel, no mock/sample mode. The app reads and writes directly through your Apps Script backend.
 const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4AnVbFlPPgWOK0I-N7TldTj0AP5w-1nKCJh-tIZNlXQushsmdJdYgM5V1as7K3RQ7yQ/exec';
 const USER_ID = 'USER_001';
 
 /* =========================
-   API KEYS INJECTED
+   BACKEND API PROVIDERS
 ========================= */
-const KEYS = {
-  apiNinjas: 'GHoNF3wzt9dEa9GRfd6H3asKzcN74d1e0KrOZ1ns',
-  spoonacular: 'a45d9823aedcdf3f504994bbcc85e7c8da1c9803',
-  youtube: 'AIzaSyBEA8_ZAR9bqKbdLVr1B4fD8ABlMxmajGk',
-  exerciseDB: '20879b7a43mshddfab18b9c2fbcfp192a05jsn44e0907b3cee',
-  usda: '1h1N0y9ACSq5LNhXdZXlAXpacLnVFexEkNWdl0gI'
+// API secrets should stay inside Apps Script PropertiesService, not in GitHub frontend code.
+const API_PROVIDERS = {
+  apiNinjas: 'apiNinjas',
+  spoonacular: 'spoonacular',
+  youtube: 'youtube'
 };
+
+async function backendApi(provider, params = {}) {
+  const res = await fetch(APP_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'api', provider, params, userId: USER_ID })
+  });
+  if (!res.ok) throw new Error('Backend API request failed.');
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json.data ?? json;
+}
 
 /* =========================
    SVG ICON HELPERS
@@ -652,7 +736,7 @@ const icons = {
 
 const navItems = [
   ['System','dashboard',icons.dash,'Overview'],['System','profile',icons.user,'Physique & Identity'],
-  ['Training','planner',icons.plan,'Protocol Planner'],['Training','calendar',icons.cal,'Execution Calendar'],
+  ['Training','planner',icons.plan,'Protocol Planner'],['Training','schedules',icons.plan,'Workout Schedules'],['Training','calendar',icons.cal,'Execution Calendar'],
   ['Training','workoutLogs',icons.weight,'Session Entry'],['Training','prs',icons.trophy,'Records & 1RM'],
   ['Training','intelligence',icons.brain,'AI Intelligence'],['Training','exercises',icons.db,'Movement DB'],
   ['Nutrition','nutrition',icons.food,'Intake Logs'],['Nutrition','calculator',icons.calc,'Biometric Calc'],
@@ -664,69 +748,55 @@ const navItems = [
 /* =========================
    LIVE API FETCH FUNCTIONS
 ========================= */
-// 1. API-Ninjas Exercise Fetch
+// 1. API-Ninjas Exercise Fetch through backend
 async function searchLiveExercises() {
-  const query = document.getElementById('apiExerciseSearch').value;
+  const query = document.getElementById('apiExerciseSearch').value.trim();
   if (!query) return toast('Please enter a search term', 'warning');
-  
-  document.getElementById('exerciseDb').innerHTML = '<div class="empty">Loading API Data...</div>';
-  
+  document.getElementById('exerciseDb').innerHTML = '<div class="empty">Loading backend exercise data...</div>';
   try {
-    const res = await fetch(`https://api.api-ninjas.com/v1/exercises?name=${query}`, {
-      method: 'GET', headers: { 'X-Api-Key': KEYS.apiNinjas }
-    });
-    if (!res.ok) throw new Error('Failed to fetch from API-Ninjas');
-    
-    const data = await res.json();
+    const data = await backendApi(API_PROVIDERS.apiNinjas, { name: query });
     if (!data.length) {
       document.getElementById('exerciseDb').innerHTML = '<div class="empty">No exercises found.</div>';
       return;
     }
-    
-    const html = `<table><thead><tr><th>Name</th><th>Muscle</th><th>Equipment</th><th>Difficulty</th><th>Instructions</th></tr></thead><tbody>
+    const html = `<div class="table-wrap"><table><thead><tr><th>Name</th><th>Muscle</th><th>Equipment</th><th>Difficulty</th><th>Instructions</th></tr></thead><tbody>
       ${data.map(ex => `<tr>
-        <td style="color:var(--brand); font-weight:bold;">${ex.name}</td>
-        <td><span class="badge info">${ex.muscle}</span></td>
-        <td>${ex.equipment}</td>
-        <td>${ex.difficulty}</td>
-        <td style="font-size:0.8rem; line-height:1.4;">${ex.instructions.substring(0, 150)}...</td>
+        <td style="color:var(--brand); font-weight:bold;">${escapeHtml(ex.name)}</td>
+        <td><span class="badge info">${escapeHtml(ex.muscle)}</span></td>
+        <td>${escapeHtml(ex.equipment)}</td>
+        <td>${escapeHtml(ex.difficulty)}</td>
+        <td style="font-size:0.8rem; line-height:1.4;">${escapeHtml(String(ex.instructions || '').slice(0, 150))}...</td>
       </tr>`).join('')}
-    </tbody></table>`;
-    
+    </tbody></table></div>`;
     document.getElementById('exerciseDb').innerHTML = html;
     toast('Exercises loaded successfully');
   } catch(e) {
-    document.getElementById('exerciseDb').innerHTML = `<div class="empty">API Error: ${e.message}</div>`;
+    document.getElementById('exerciseDb').innerHTML = `<div class="empty">API Error: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-// 2. Spoonacular Recipe Fetch
+// 2. Spoonacular Recipe Fetch through backend
 async function searchLiveRecipes() {
-  const query = document.getElementById('apiRecipeSearch').value;
+  const query = document.getElementById('apiRecipeSearch').value.trim();
   if (!query) return toast('Please enter a recipe search term', 'warning');
-  
-  document.getElementById('recipeLibrary').innerHTML = '<div class="empty">Querying Spoonacular DB...</div>';
-  
+  document.getElementById('recipeLibrary').innerHTML = '<div class="empty">Querying backend recipe API...</div>';
   try {
-    const res = await fetch(`https://api.spoonacular.com/recipes/complexSearch?query=${query}&addRecipeNutrition=true&number=6&apiKey=${KEYS.spoonacular}`);
-    if (!res.ok) throw new Error('Spoonacular limit reached or failed');
-    
-    const data = await res.json();
-    if (!data.results.length) {
+    const data = await backendApi(API_PROVIDERS.spoonacular, { query, addRecipeNutrition: true, number: 6 });
+    const results = data.results || [];
+    if (!results.length) {
       document.getElementById('recipeLibrary').innerHTML = '<div class="empty">No recipes found.</div>';
       return;
     }
-    
     const html = `<div class="grid" style="margin-top:0;">
-      ${data.results.map(r => {
-        const pro = r.nutrition.nutrients.find(n => n.name === 'Protein')?.amount || 0;
-        const cal = r.nutrition.nutrients.find(n => n.name === 'Calories')?.amount || 0;
-        const carbs = r.nutrition.nutrients.find(n => n.name === 'Carbohydrates')?.amount || 0;
-        const fat = r.nutrition.nutrients.find(n => n.name === 'Fat')?.amount || 0;
-        
+      ${results.map(r => {
+        const nutrients = r.nutrition?.nutrients || [];
+        const pro = nutrients.find(n => n.name === 'Protein')?.amount || 0;
+        const cal = nutrients.find(n => n.name === 'Calories')?.amount || 0;
+        const carbs = nutrients.find(n => n.name === 'Carbohydrates')?.amount || 0;
+        const fat = nutrients.find(n => n.name === 'Fat')?.amount || 0;
         return `<div class="card quarter" style="padding:16px;">
-          <img src="${r.image}" alt="${r.title}" style="width:100%; border-radius:8px; margin-bottom:12px;">
-          <h3 style="font-size:0.9rem; line-height:1.2; color:#fff;">${r.title}</h3>
+          ${r.image ? `<img src="${escapeAttr(r.image)}" alt="${escapeAttr(r.title)}" style="width:100%; border-radius:8px; margin-bottom:12px;">` : ''}
+          <h3 style="font-size:0.9rem; line-height:1.2; color:#fff;">${escapeHtml(r.title)}</h3>
           <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">
             <span class="badge info">${Math.round(cal)} kcal</span>
             <span class="badge success">Pro: ${Math.round(pro)}g</span>
@@ -736,48 +806,36 @@ async function searchLiveRecipes() {
         </div>`;
       }).join('')}
     </div>`;
-    
     document.getElementById('recipeLibrary').innerHTML = html;
     toast('Recipes loaded successfully');
   } catch(e) {
-    document.getElementById('recipeLibrary').innerHTML = `<div class="empty">API Error: ${e.message}</div>`;
+    document.getElementById('recipeLibrary').innerHTML = `<div class="empty">API Error: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-// 3. YouTube API Fetch
+// 3. YouTube API Fetch through backend
 async function fetchLiveYoutubeVideos() {
-  document.getElementById('tipsLibrary').innerHTML = '<div class="empty">Connecting to YouTube API...</div>';
-  
+  document.getElementById('tipsLibrary').innerHTML = '<div class="empty">Connecting to backend YouTube API...</div>';
   try {
-    const channelId = 'UCe1jD3H4Rj4lGeq5jC71Kcw';
-    const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${KEYS.youtube}&channelId=${channelId}&part=snippet,id&order=date&maxResults=5`);
-    
-    if (!res.ok) {
-       // Graceful fallback if quota is exceeded
-       if(res.status === 403) throw new Error('YouTube quota exceeded for today. Please try again tomorrow.');
-       throw new Error('YouTube API failed');
-    }
-    
-    const data = await res.json();
-    const html = data.items.filter(item => item.id.videoId).map(item => `
+    const data = await backendApi(API_PROVIDERS.youtube, { channelId: 'UCe1jD3H4Rj4lGeq5jC71Kcw', maxResults: 5 });
+    const items = data.items || [];
+    const html = items.filter(item => item.id?.videoId).map(item => `
       <div class="notice" style="border-left: 3px solid var(--brand); display:flex; flex-direction:row; gap:16px;">
-        <img src="${item.snippet.thumbnails.default.url}" style="width:120px; height:90px; border-radius:8px; object-fit:cover;">
+        <img src="${escapeAttr(item.snippet?.thumbnails?.default?.url || '')}" style="width:120px; height:90px; border-radius:8px; object-fit:cover;">
         <div>
-          <strong style="display:block; margin-bottom:4px; font-size:1rem;">${item.snippet.title}</strong>
-          <span class="small muted" style="display:block; margin-bottom:8px;">Channel: ${item.snippet.channelTitle}</span>
-          <a href="https://www.youtube.com/watch?v=${item.id.videoId}" target="_blank" class="badge info" style="text-decoration:none;">Watch Video</a>
+          <strong style="display:block; margin-bottom:4px; font-size:1rem;">${escapeHtml(item.snippet?.title || 'Fitness video')}</strong>
+          <span class="small muted" style="display:block; margin-bottom:8px;">Channel: ${escapeHtml(item.snippet?.channelTitle || '')}</span>
+          <a href="https://www.youtube.com/watch?v=${escapeAttr(item.id.videoId)}" target="_blank" class="badge info" style="text-decoration:none;">Watch Video</a>
         </div>
       </div>
     `).join('');
-    
-    document.getElementById('tipsLibrary').innerHTML = html;
-    toast('Latest Influencer videos synced');
+    document.getElementById('tipsLibrary').innerHTML = html || '<div class="empty">No YouTube videos returned from backend.</div>';
+    toast('Latest videos synced');
   } catch (e) {
-    document.getElementById('tipsLibrary').innerHTML = `<div class="empty" style="color:var(--warn);">API Note: ${e.message}</div>`;
+    document.getElementById('tipsLibrary').innerHTML = `<div class="empty" style="color:var(--warn);">API Note: ${escapeHtml(e.message)}</div>`;
     toast(e.message, 'warning');
   }
 }
-
 
 /* =========================
    STORAGE + GOOGLE SHEETS
@@ -838,17 +896,18 @@ function switchTab(tabId){
   document.getElementById(tabId).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));
   const item = navItems.find(i=>i[1]===tabId);
-  document.getElementById('pageTitle').textContent = item ? item[3] : 'Zono Fitness';
+  document.getElementById('pageTitle').textContent = item ? item[3] : 'FITNESS';
   document.getElementById('pageSubtitle').textContent = pageSubtitle(tabId);
   document.body.classList.remove('sidebar-open');
   
   if(tabId==='calendar') generateWorkoutCalendar();
+  if(tabId==='schedules') renderScheduleManager();
   if(tabId==='reports') renderMonthlyReport();
   if(tabId==='achievements') generateAchievements();
   updateDashboard();
 }
 function pageSubtitle(id){
-  return {dashboard:'Last 30 Days Telemetry',profile:'Identity & Physics Variables',planner:'Active Protocol Configuration',calendar:'Algorithm-Based Rest Detection',workoutLogs:'Entry & Execution Logs',prs:'1RM Mathematics',intelligence:'Fatigue & Deficit Detection',exercises:'Library & Heatmap Integration',nutrition:'Macros & Micronutrients',calculator:'TDEE & Physics Target Engine',recipes:'Culinary Formulations',recovery:'CNS Readiness & Score',body:'Trajectory Log',achievements:'Gamification Status',reports:'Aggregated Data',learn:'External Knowledge Base'}[id] || '';
+  return {dashboard:'Last 30 Days Telemetry',profile:'Identity & Physics Variables',planner:'Active Protocol Configuration',schedules:'Current & Old Workout Library',calendar:'Algorithm-Based Rest Detection',workoutLogs:'Entry & Execution Logs',prs:'1RM Mathematics',intelligence:'Fatigue & Deficit Detection',exercises:'Library & Heatmap Integration',nutrition:'Macros & Micronutrients',calculator:'TDEE & Physics Target Engine',recipes:'Culinary Formulations',recovery:'CNS Readiness & Score',body:'Trajectory Log',achievements:'Gamification Status',reports:'Aggregated Data',learn:'External Knowledge Base'}[id] || '';
 }
 
 /* =========================
@@ -920,6 +979,93 @@ function addExerciseRow(){
     </div><button type="button" class="secondary" style="margin-top:16px; padding: 10px 16px; font-size:0.75rem;" onclick="this.closest('.exercise-row').remove()">Remove Block</button></div>`);
 }
 function rowVolume(el){const row=el.closest('.exercise-row');const sets=row.querySelector('[name="Sets"]').value,reps=row.querySelector('[name="Reps"]').value,w=row.querySelector('[name="WeightUsed"]').value;row.querySelector('[name="Volume"]').value=calculateWorkoutVolume(sets,reps,w)}
+
+
+let activeScheduleFilter = 'All';
+function setScheduleFilter(filter, btn){
+  activeScheduleFilter = filter;
+  document.querySelectorAll('#scheduleFilterTabs button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderScheduleManager();
+}
+function addScheduleExerciseRow(data={}){
+  const wrap = document.getElementById('scheduleExerciseRows');
+  if(!wrap) return;
+  const order = wrap.querySelectorAll('.schedule-exercise-row').length + 1;
+  wrap.insertAdjacentHTML('beforeend',`<div class="card full schedule-exercise-row" style="padding:18px; margin:14px 0; background:var(--bg);">
+    <div class="form-grid">
+      <div class="field"><label>Exercise</label><input name="ExerciseName" required value="${escapeAttr(data.ExerciseName||'')}"></div>
+      <div class="field"><label>Muscle</label><input name="MuscleGroup" value="${escapeAttr(data.MuscleGroup||'')}"></div>
+      <div class="field"><label>Equipment</label><input name="Equipment" value="${escapeAttr(data.Equipment||'')}"></div>
+      <div class="field"><label>Sets</label><input name="Sets" type="number" value="${escapeAttr(data.Sets||'')}"></div>
+      <div class="field"><label>Reps</label><input name="Reps" value="${escapeAttr(data.Reps||'')}"></div>
+      <div class="field"><label>Load / Target</label><input name="WeightUsed" value="${escapeAttr(data.WeightUsed||'')}" placeholder="kg / bodyweight / band"></div>
+      <div class="field"><label>Rest (sec)</label><input name="RestTime" value="${escapeAttr(data.RestTime||'')}"></div>
+      <div class="field"><label>Tempo</label><input name="Tempo" value="${escapeAttr(data.Tempo||'')}" placeholder="3-1-1"></div>
+      <div class="field"><label>Order</label><input name="OrderIndex" type="number" value="${escapeAttr(data.OrderIndex||order)}"></div>
+      <div class="field full"><label>Notes</label><input name="Notes" value="${escapeAttr(data.Notes||'')}"></div>
+    </div>
+    <button type="button" class="secondary" style="margin-top:14px; padding:10px 16px; font-size:.75rem;" onclick="this.closest('.schedule-exercise-row').remove()">Remove Exercise</button>
+  </div>`);
+}
+async function handleScheduleSubmit(e){
+  e.preventDefault();
+  const base = formData(e.target);
+  base.ScheduleID = uid('SCH');
+  try {
+    await saveToSheet('Workout_Schedules', base);
+    const rows = [...document.querySelectorAll('.schedule-exercise-row')].map((r,idx)=>{
+      const o={}; r.querySelectorAll('input,select,textarea').forEach(i=>o[i.name]=i.value);
+      return {...o, ScheduleExerciseID:uid('SCHEX'), ScheduleID:base.ScheduleID, ScheduleName:base.ScheduleName, ScheduleType:base.ScheduleType, WorkoutDayName:base.WorkoutDayName, UserID:USER_ID, OrderIndex:o.OrderIndex||idx+1};
+    }).filter(r=>r.ExerciseName);
+    for(const row of rows) await saveToSheet('Workout_Schedule_Exercises', row);
+    toast('Workout schedule saved');
+    e.target.reset(); document.getElementById('scheduleExerciseRows').innerHTML=''; addScheduleExerciseRow(); renderScheduleManager();
+  } catch(err){ toast('Schedule save failed: '+err.message, 'danger'); }
+}
+async function renderScheduleManager(){
+  const box = document.getElementById('scheduleLibrary');
+  if(!box) return;
+  const [schedules, exercises] = await Promise.all(['Workout_Schedules','Workout_Schedule_Exercises'].map(loadFromSheet));
+  const filtered = schedules.filter(s=>activeScheduleFilter==='All' || String(s.ScheduleType).toLowerCase()===activeScheduleFilter.toLowerCase());
+  if(!filtered.length){ box.innerHTML = `<div class="empty compact full">No ${activeScheduleFilter.toLowerCase()} workout schedules found. Add your current routine or import old routines below.</div>`; return; }
+  box.innerHTML = filtered.slice().reverse().map(s=>{
+    const rows = exercises.filter(e=>e.ScheduleID===s.ScheduleID).sort((a,b)=>Number(a.OrderIndex||0)-Number(b.OrderIndex||0));
+    const totalSets = rows.reduce((sum,r)=>sum+Number(r.Sets||0),0);
+    const repText = rows.map(r=>`${escapeHtml(r.ExerciseName||'Exercise')} · ${escapeHtml(r.Sets||'-')}×${escapeHtml(r.Reps||'-')}`).join('</span><span>');
+    return `<div class="routine-card full">
+      <div class="routine-head">
+        <div>
+          <span class="badge ${String(s.ScheduleType).toLowerCase()==='current'?'success':'info'}">${escapeHtml(s.ScheduleType||'Schedule')}</span>
+          <h3 style="margin:12px 0 6px; color:#fff;">${escapeHtml(s.ScheduleName||'Untitled Schedule')}</h3>
+          <div class="small muted">${escapeHtml(s.WorkoutDayName||'Workout')} ${s.PhaseName ? '· '+escapeHtml(s.PhaseName) : ''}</div>
+        </div>
+        <div class="routine-meta">
+          <span class="badge">${rows.length} exercises</span><span class="badge">${totalSets} sets</span>
+          <button class="secondary" type="button" onclick="loadScheduleIntoSession('${escapeAttr(s.ScheduleID||'')}')">Use in Session</button>
+        </div>
+      </div>
+      <div class="exercise-pill-list">${rows.length?'<span>'+repText+'</span>':'<span>No exercises saved yet</span>'}</div>
+      ${s.Notes ? `<p class="small muted" style="margin:0;">${escapeHtml(s.Notes)}</p>` : ''}
+    </div>`;
+  }).join('');
+}
+async function loadScheduleIntoSession(scheduleId){
+  const [schedules, exercises] = await Promise.all(['Workout_Schedules','Workout_Schedule_Exercises'].map(loadFromSheet));
+  const schedule = schedules.find(s=>s.ScheduleID===scheduleId);
+  const rows = exercises.filter(e=>e.ScheduleID===scheduleId).sort((a,b)=>Number(a.OrderIndex||0)-Number(b.OrderIndex||0));
+  if(!schedule){ toast('Schedule not found', 'warning'); return; }
+  switchTab('workoutLogs');
+  const form = document.querySelector('#workoutLogs form');
+  form.querySelector('[name="ScheduledWorkout"]').value = schedule.WorkoutDayName || schedule.ScheduleName || '';
+  form.querySelector('[name="ActualWorkout"]').value = schedule.WorkoutDayName || schedule.ScheduleName || '';
+  const wrap = document.getElementById('exerciseRows'); wrap.innerHTML = '';
+  rows.forEach(r=>{ addExerciseRow(); const row=wrap.lastElementChild; ['ExerciseName','MuscleGroup','Equipment','Sets','Reps','WeightUsed','RestTime','Tempo','Notes'].forEach(k=>{const el=row.querySelector(`[name="${k}"]`); if(el) el.value=r[k]||'';}); rowVolume(row.querySelector('[name="Sets"]')); });
+  if(!rows.length) addExerciseRow();
+  toast('Schedule loaded into session entry');
+}
+function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;');}
 
 function addMealRow(){
   document.getElementById('mealRows').insertAdjacentHTML('beforeend',`<div class="card full meal-row" style="padding:20px; margin:16px 0; background: var(--bg);"><div class="form-grid">
@@ -1000,7 +1146,7 @@ function avg(arr){arr=arr.filter(Boolean);return arr.length?arr.reduce((a,b)=>a+
 function renderWorkoutHistory(logs){document.getElementById('workoutHistory').innerHTML=logs.length?table(['Date','Scheduled','Actual','Status','Duration'],logs.slice(-10).reverse().map(l=>[l.Date,l.ScheduledWorkout,l.ActualWorkout,l.Status,l.Duration_min])):'<div class="empty">No execution logs yet.</div>'}
 function renderPRHistory(prs){document.getElementById('prHistory').innerHTML=prs.length?table(['Movement','Date','Load','Reps','1RM','Delta'],prs.slice(-10).reverse().map(p=>[p.Exercise,p.Date,p.Weight,p.Reps,p.Estimated1RM,p.Change])):'<div class="empty">No milestones registered.</div>'}
 function renderMealHistory(meals){document.getElementById('mealHistory').innerHTML=meals.length?table(['Date','Type','Item','Kcal','Pro'],meals.slice(-12).reverse().map(m=>[m.Date,m.MealType,m.FoodName,m.Calories,m.Protein])):'<div class="empty">No intake logged.</div>'}
-function table(headers,rows){return `<table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c??''}</td>`).join('')}</tr>`).join('')}</tbody></table>`}
+function table(headers,rows){return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c??''}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
 async function renderPlans(){const plans=await loadFromSheet('Workout_Plans');document.getElementById('plansTable').innerHTML=plans.length?table(['Protocol','Initiation','Architecture','Active'],plans.slice().reverse().map(p=>[p.SplitName,p.StartDate,p.PatternType,p.IsActive])):'<div class="empty">No active protocols.</div>'}
 
 /* =========================
@@ -1152,7 +1298,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   const today=new Date().toISOString().slice(0,10); 
   document.querySelectorAll('input[type="date"]').forEach(i=>{if(!i.value)i.value=today}); 
   document.getElementById('calendarMonth').value=today.slice(0,7);
-  addExerciseRow(); addMealRow(); updateDashboard(); generateWorkoutCalendar();
+  addExerciseRow(); addMealRow(); addScheduleExerciseRow(); renderScheduleManager(); updateDashboard(); generateWorkoutCalendar();
 });
 </script>
 </body>
