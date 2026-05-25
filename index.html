@@ -21,12 +21,12 @@
       --soft: #d4d4d8;
       
       /* Vibrant Blue Accents */
-      --brand: #3b82f6; /* Bright Blue */
-      --brand2: #2563eb; /* Deep Blue */
+      --brand: #3b82f6; 
+      --brand2: #2563eb; 
       --brand-glow: rgba(59, 130, 246, 0.4);
-      --accent: #10b981; /* Emerald */
-      --warn: #f59e0b; /* Amber */
-      --danger: #ef4444; /* Rose */
+      --accent: #10b981; 
+      --warn: #f59e0b; 
+      --danger: #ef4444; 
       
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3); 
       --radius: 16px; 
@@ -71,27 +71,12 @@
     .nav-section { margin: 24px 0 8px; color: var(--muted); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.1em; }
     
     .nav-item {
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
-      width: 100%; 
-      padding: 14px 16px; 
-      margin: 4px 0; 
-      border: 1px solid transparent;
-      background: transparent; 
-      color: var(--soft); 
-      border-radius: 8px; 
-      cursor: pointer; 
-      text-align: left; 
-      font-weight: 600; 
-      font-size: 0.9rem; 
-      transition: 0.2s;
+      display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; 
+      margin: 4px 0; border: 1px solid transparent; background: transparent; 
+      color: var(--soft); border-radius: 8px; cursor: pointer; text-align: left; 
+      font-weight: 600; font-size: 0.9rem; transition: 0.2s;
     }
-    .nav-item span {
-      display: inline-block;
-      line-height: 1; 
-      padding-top: 2px;
-    }
+    .nav-item span { display: inline-block; line-height: 1; padding-top: 2px; }
     .nav-item svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; opacity: 0.7; }
     .nav-item:hover, .nav-item.active { background: var(--panel-hover); color: #fff; }
     .nav-item.active { border-left: 4px solid var(--brand); border-radius: 0 8px 8px 0; padding-left: 12px; background: rgba(59, 130, 246, 0.1); color: var(--brand); }
@@ -175,6 +160,7 @@
     /* --- SPECIFIC MODULES --- */
     .notice { border-radius: var(--radius2); border: 1px solid var(--border); padding: 16px; background: var(--bg); margin: 12px 0; display: flex; flex-direction: column; gap: 6px; }
     .notice strong { color: #fff; font-size: 1.05rem; }
+    .notice img { width: 100%; border-radius: 8px; margin-top: 8px; object-fit: cover; }
     
     .toast-container { position: fixed; right: 24px; bottom: 24px; z-index: 100; display: grid; gap: 12px; }
     .toast-item { padding: 16px 24px; border-radius: var(--radius2); background: var(--panel); border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease; font-weight: 600; font-size: 0.95rem; border-left: 4px solid var(--brand); color: #fff;}
@@ -186,17 +172,13 @@
     
     .empty { padding: 48px 24px; text-align: center; border: 1px dashed var(--border); border-radius: var(--radius2); color: var(--muted); font-weight: 500; background: var(--bg); }
     .toolbar { display: flex; gap: 12px; flex-wrap: wrap; }
-
-    /* Fix Chart Containers */
     .chart-container { position: relative; height: 250px; width: 100%; margin-top: 16px; }
 
-    /* SVG MAP */
     .body-map { display: grid; place-items: center; height: 100%; min-height: 300px; padding: 20px; background: var(--bg); border-radius: var(--radius2); border: 1px solid var(--border); }
     .body-map svg { width: 100%; max-width: 200px; }
     .muscle-group { transition: 0.2s; cursor: pointer; stroke: var(--panel); stroke-width: 2; }
     .muscle-group:hover { filter: brightness(1.2); }
 
-    /* RESPONSIVE */
     @media(max-width: 1080px) {
       .app { grid-template-columns: 1fr; }
       aside { position: fixed; left: -300px; width: 280px; transition: left 0.3s ease; }
@@ -256,15 +238,11 @@
       <div class="grid">
         <div class="card wide">
           <h3>Volume Progression (kg)</h3>
-          <div class="chart-container">
-            <canvas id="volumeChart"></canvas>
-          </div>
+          <div class="chart-container"><canvas id="volumeChart"></canvas></div>
         </div>
         <div class="card third">
           <h3>Muscle Distribution</h3>
-          <div class="chart-container">
-            <canvas id="muscleChart"></canvas>
-          </div>
+          <div class="chart-container"><canvas id="muscleChart"></canvas></div>
         </div>
         <div class="card half">
           <h3>Target Tracking</h3>
@@ -299,48 +277,26 @@
               <div class="field half">
                 <label>Primary Body Goal</label>
                 <select name="Goal" id="goalInput" onchange="updateCalculatorPreview()">
-                  <option>Fat loss / cutting</option>
-                  <option>Lean bulk</option>
-                  <option>Bodybuilding prep</option>
-                  <option>Strength training prep</option>
-                  <option selected>Muscle Definition (Realistic/Natural Look)</option>
-                  <option>General fitness</option>
+                  <option>Fat loss / cutting</option><option>Lean bulk</option><option>Bodybuilding prep</option><option>Strength training prep</option><option selected>Muscle Definition (Realistic/Natural Look)</option><option>General fitness</option>
                 </select>
               </div>
               <div class="field half">
                 <label>Photo Processing Mode</label>
-                <select name="PhotoProcessing">
-                  <option selected>Raw / Natural (Bypass Auto-Enhance)</option>
-                  <option>Standard Processing</option>
-                </select>
+                <select name="PhotoProcessing"><option selected>Raw / Natural (Bypass Auto-Enhance)</option><option>Standard Processing</option></select>
               </div>
 
               <div class="field"><label>Activity Level</label><select name="ActivityLevel" id="activityInput" onchange="updateCalculatorPreview()"><option>Sedentary</option><option>Light</option><option selected>Moderate</option><option>Active</option><option>Very active</option></select></div>
               <div class="field"><label>Experience Level</label><select name="ExperienceLevel"><option>Beginner</option><option selected>Intermediate</option><option>Advanced</option></select></div>
               <div class="field"><label>Dietary Preference</label><select name="DietPreference"><option>Meat based</option><option>Vegetarian</option><option>Vegan</option><option selected>Mixed (Pizza/Dairy included)</option></select></div>
-              
               <div class="field full"><label>Profile Image URL</label><input type="url" name="PhotoURL" placeholder="https://..."></div>
             </div>
-            <div class="toolbar" style="margin-top:24px">
-              <button>Save to Database</button>
-              <button type="button" class="secondary" onclick="loadLatestProfile()">Sync from Sheets</button>
-            </div>
+            <div class="toolbar" style="margin-top:24px"><button>Save to Database</button><button type="button" class="secondary" onclick="loadLatestProfile()">Sync from Sheets</button></div>
           </form>
         </div>
         <div class="card third">
-          <div style="margin-bottom: 24px;">
-            <h3>BMI</h3>
-            <div class="big" id="bmiPreview" style="color:var(--brand)">0.0</div>
-          </div>
-          <div style="margin-bottom: 24px;">
-            <h3>Target TDEE</h3>
-            <div class="big" id="tdeePreview" style="color:var(--warn)">0</div>
-            <p class="small muted">Mifflin-St Jeor Formula applied.</p>
-          </div>
-          <div>
-            <h3>Protein Target</h3>
-            <div class="big" id="proteinPreview" style="color:var(--accent)">0g</div>
-          </div>
+          <div style="margin-bottom: 24px;"><h3>BMI</h3><div class="big" id="bmiPreview" style="color:var(--brand)">0.0</div></div>
+          <div style="margin-bottom: 24px;"><h3>Target TDEE</h3><div class="big" id="tdeePreview" style="color:var(--warn)">0</div><p class="small muted">Mifflin-St Jeor Formula applied.</p></div>
+          <div><h3>Protein Target</h3><div class="big" id="proteinPreview" style="color:var(--accent)">0g</div></div>
         </div>
       </div>
     </section>
@@ -356,10 +312,7 @@
               <div class="field full">
                 <label>Split Pattern Structure</label>
                 <select name="PatternType" id="patternType" onchange="toggleCustomPattern()">
-                  <option selected>3 workout days + 1 rest day</option>
-                  <option>2 workout days + 1 rest day</option>
-                  <option>5 days workout + 2 rest days</option>
-                  <option>Custom repeating pattern</option>
+                  <option selected>3 workout days + 1 rest day</option><option>2 workout days + 1 rest day</option><option>5 days workout + 2 rest days</option><option>Custom repeating pattern</option>
                 </select>
               </div>
               <div class="field full"><label>Sequence (JSON Array)</label><input name="PatternJSON" id="patternJson" value='["Push","Pull","Legs","Rest"]'></div>
@@ -368,26 +321,12 @@
             <button style="margin-top:24px">Deploy Protocol</button>
           </form>
         </div>
-        <div class="card half">
-          <h3>Protocol History</h3>
-          <div id="plansTable" class="empty">System pending protocol data.</div>
-        </div>
+        <div class="card half"><h3>Protocol History</h3><div id="plansTable" class="empty">System pending protocol data.</div></div>
       </div>
     </section>
 
     <section id="calendar" class="page">
-      <div class="grid">
-        <div class="card full">
-          <div class="statline">
-            <h3>Split Execution Calendar</h3>
-            <div class="toolbar">
-              <input type="month" id="calendarMonth" onchange="generateWorkoutCalendar()">
-              <button class="secondary" onclick="generateWorkoutCalendar()">Sync</button>
-            </div>
-          </div>
-          <div class="calendar" id="calendarGrid"></div>
-        </div>
-      </div>
+      <div class="grid"><div class="card full"><div class="statline"><h3>Split Execution Calendar</h3><div class="toolbar"><input type="month" id="calendarMonth" onchange="generateWorkoutCalendar()"><button class="secondary" onclick="generateWorkoutCalendar()">Sync</button></div></div><div class="calendar" id="calendarGrid"></div></div></div>
     </section>
 
     <section id="workoutLogs" class="page">
@@ -399,30 +338,18 @@
               <div class="field"><label>Date</label><input type="date" name="Date" required></div>
               <div class="field"><label>Scheduled Day</label><input name="ScheduledWorkout" placeholder="Auto-fills from Calendar"></div>
               <div class="field"><label>Actual Execution</label><input name="ActualWorkout" placeholder="What you actually trained"></div>
-              
-              <div class="field"><label>Session Status</label>
-                <select name="Status">
-                  <option>Completed</option><option>Skipped</option><option>Missed</option><option>Moved / Delayed</option><option>Rest day</option>
-                </select>
-              </div>
+              <div class="field"><label>Session Status</label><select name="Status"><option>Completed</option><option>Skipped</option><option>Missed</option><option>Moved / Delayed</option><option>Rest day</option></select></div>
               <div class="field"><label>Start Time</label><input type="time" name="StartTime" id="startTime" onchange="calculateWorkoutDuration()"></div>
               <div class="field"><label>End Time</label><input type="time" name="EndTime" id="endTime" onchange="calculateWorkoutDuration()"></div>
               <div class="field"><label>Total Duration (min)</label><input name="Duration_min" id="durationOutput" readonly style="color:var(--brand); font-weight:bold;"></div>
               <div class="field half"><label>Session Notes</label><input name="Notes" placeholder="Reason for missing, or general feelings..."></div>
             </div>
-            
             <h3 style="margin-top: 32px; border-top: 1px solid var(--border); padding-top: 24px;">Exercise Telemetry</h3>
             <div id="exerciseRows"></div>
-            <div class="toolbar" style="margin-top: 16px;">
-              <button type="button" class="secondary" onclick="addExerciseRow()">Add Exercise Block</button>
-              <button>Commit Session to Database</button>
-            </div>
+            <div class="toolbar" style="margin-top: 16px;"><button type="button" class="secondary" onclick="addExerciseRow()">Add Exercise Block</button><button>Commit Session to Database</button></div>
           </form>
         </div>
-        <div class="card full">
-          <h3>Recent Telemetry History</h3>
-          <div id="workoutHistory"></div>
-        </div>
+        <div class="card full"><h3>Recent Telemetry History</h3><div id="workoutHistory"></div></div>
       </div>
     </section>
 
@@ -440,16 +367,8 @@
             <button style="margin-top:24px">Commit Record</button>
           </form>
         </div>
-        <div class="card half">
-          <h3>Estimated 1RM Trajectory</h3>
-          <div class="chart-container" style="height: 180px;">
-            <canvas id="prChart"></canvas>
-          </div>
-        </div>
-        <div class="card full">
-          <h3>Record Ledger</h3>
-          <div id="prHistory"></div>
-        </div>
+        <div class="card half"><h3>Estimated 1RM Trajectory</h3><div class="chart-container" style="height: 180px;"><canvas id="prChart"></canvas></div></div>
+        <div class="card full"><h3>Record Ledger</h3><div id="prHistory"></div></div>
       </div>
     </section>
 
@@ -459,33 +378,25 @@
           <h3>1RM Calculator</h3>
           <label>Load (kg)</label><input id="oneWeight" type="number" oninput="calc1RMWidget()">
           <label style="margin-top:12px;">Reps</label><input id="oneReps" type="number" oninput="calc1RMWidget()">
-          <div class="big" id="oneRM" style="color:var(--brand)">0.0</div>
-          <p class="small muted">Epley Formula applied.</p>
+          <div class="big" id="oneRM" style="color:var(--brand)">0.0</div><p class="small muted">Epley Formula applied.</p>
         </div>
         <div class="card quarter">
           <h3>Rest Interval Protocol</h3>
           <div class="big" id="timerDisplay">00:00</div>
           <div class="toolbar" style="margin-top:16px;">
-            <button class="secondary" onclick="startTimer(60)">60s</button>
-            <button class="secondary" onclick="startTimer(90)">90s</button>
-            <button class="secondary" onclick="startTimer(180)">180s</button>
+            <button class="secondary" onclick="startTimer(60)">60s</button><button class="secondary" onclick="startTimer(90)">90s</button><button class="secondary" onclick="startTimer(180)">180s</button>
           </div>
         </div>
         <div class="card quarter">
           <h3>Warm-up Matrix</h3>
-          <label>Target Working Load (kg)</label>
-          <input id="warmupWeight" type="number" oninput="warmupCalculator()">
+          <label>Target Working Load (kg)</label><input id="warmupWeight" type="number" oninput="warmupCalculator()">
           <div id="warmupOutput" class="small muted" style="margin-top: 12px; line-height:1.6;">Awaiting input...</div>
         </div>
         <div class="card quarter">
           <h3>Overload Delta</h3>
-          <div class="big" id="overloadScore" style="color:var(--accent)">0%</div>
-          <p class="small muted">Volume change vs previous 10 sessions.</p>
+          <div class="big" id="overloadScore" style="color:var(--accent)">0%</div><p class="small muted">Volume change vs previous 10 sessions.</p>
         </div>
-        <div class="card full">
-          <h3>Actionable System Directives</h3>
-          <div id="intelligenceNotices"></div>
-        </div>
+        <div class="card full"><h3>Actionable System Directives</h3><div id="intelligenceNotices"></div></div>
       </div>
     </section>
 
@@ -493,14 +404,19 @@
       <div class="grid">
         <div class="card full">
           <div class="statline">
-            <h3>Movement Database</h3>
-            <button class="secondary" onclick="openModal('exerciseModal')">Register New Movement</button>
+            <h3>Movement Database (API-NINJAS LIVE)</h3>
+            <button class="secondary" onclick="openModal('exerciseModal')">Register Custom Movement</button>
           </div>
+          <p class="muted small">Fetching live data via api-ninjas.com API.</p>
           <div class="form-grid" style="margin-bottom: 24px;">
-            <div class="field"><label>Query</label><input id="exerciseSearch" oninput="renderExerciseDatabase()" placeholder="Search library..."></div>
-            <div class="field"><label>Target Vector</label><select id="exerciseMuscleFilter" onchange="renderExerciseDatabase()"><option>All</option><option>Chest</option><option>Back</option><option>Legs</option><option>Shoulders</option><option>Arms</option><option>Core</option></select></div>
+            <div class="field full"><label>Search Live Exercises</label>
+              <div style="display:flex; gap:12px;">
+                <input id="apiExerciseSearch" placeholder="e.g., Squat, Bicep curl..." onkeypress="if(event.key==='Enter') searchLiveExercises()">
+                <button type="button" onclick="searchLiveExercises()">Search API</button>
+              </div>
+            </div>
           </div>
-          <div id="exerciseDb"></div>
+          <div id="exerciseDb"><div class="empty">Type a movement and search the API.</div></div>
         </div>
       </div>
     </section>
@@ -511,30 +427,13 @@
           <h3>Nutritional Intake Log</h3>
           <form onsubmit="handleMealSubmit(event)">
             <div id="mealRows"></div>
-            <div class="toolbar" style="margin-top:16px;">
-              <button type="button" class="secondary" onclick="addMealRow()">Add Food Item</button>
-              <button>Commit Nutrition Data</button>
-            </div>
+            <div class="toolbar" style="margin-top:16px;"><button type="button" class="secondary" onclick="addMealRow()">Add Food Item</button><button>Commit Nutrition Data</button></div>
           </form>
         </div>
-        <div class="card third">
-          <h3>Energy Balance (kcal)</h3>
-          <div class="big" id="caloriesToday">0</div>
-          <div class="progress"><span id="calorieBar"></span></div>
-        </div>
-        <div class="card third">
-          <h3>Protein Synthesis (g)</h3>
-          <div class="big" id="proteinToday" style="color:var(--brand)">0g</div>
-          <div class="progress"><span id="proteinBar"></span></div>
-        </div>
-        <div class="card third">
-          <h3>Protocol Compliance</h3>
-          <div id="mealCompletion" style="display:flex; flex-direction:column; gap:8px;"></div>
-        </div>
-        <div class="card full">
-          <h3>Intake Ledger</h3>
-          <div id="mealHistory"></div>
-        </div>
+        <div class="card third"><h3>Energy Balance (kcal)</h3><div class="big" id="caloriesToday">0</div><div class="progress"><span id="calorieBar"></span></div></div>
+        <div class="card third"><h3>Protein Synthesis (g)</h3><div class="big" id="proteinToday" style="color:var(--brand)">0g</div><div class="progress"><span id="proteinBar"></span></div></div>
+        <div class="card third"><h3>Protocol Compliance</h3><div id="mealCompletion" style="display:flex; flex-direction:column; gap:8px;"></div></div>
+        <div class="card full"><h3>Intake Ledger</h3><div id="mealHistory"></div></div>
       </div>
     </section>
 
@@ -551,10 +450,7 @@
             <div class="field half"><label>Objective</label><select id="calcGoal" onchange="nutritionCalculator()"><option>Fat loss / cutting</option><option>Lean bulk</option><option>Maintenance</option></select></div>
           </div>
         </div>
-        <div class="card half">
-          <h3>Computed Outputs</h3>
-          <div id="nutritionResults" class="muted">Awaiting biometric data.</div>
-        </div>
+        <div class="card half"><h3>Computed Outputs</h3><div id="nutritionResults" class="muted">Awaiting biometric data.</div></div>
       </div>
     </section>
 
@@ -562,10 +458,19 @@
       <div class="grid">
         <div class="card full">
           <div class="statline">
-            <h3>Culinary Database</h3>
-            <button class="secondary" onclick="openModal('recipeModal')">Add Formulation</button>
+            <h3>Culinary Database (SPOONACULAR LIVE)</h3>
+            <button class="secondary" onclick="openModal('recipeModal')">Add Custom Formulation</button>
           </div>
-          <div id="recipeLibrary"></div>
+          <p class="muted small">Fetching live recipes with macros via Spoonacular API.</p>
+          <div class="form-grid" style="margin-bottom: 24px;">
+            <div class="field full"><label>Search Live Recipes</label>
+              <div style="display:flex; gap:12px;">
+                <input id="apiRecipeSearch" placeholder="e.g., High protein chicken, vegan salad..." onkeypress="if(event.key==='Enter') searchLiveRecipes()">
+                <button type="button" onclick="searchLiveRecipes()">Search API</button>
+              </div>
+            </div>
+          </div>
+          <div id="recipeLibrary"><div class="empty">Type a food query and search the API.</div></div>
         </div>
       </div>
     </section>
@@ -612,10 +517,7 @@
             <button style="margin-top:24px">Compute & Save Recovery Status</button>
           </form>
         </div>
-        <div class="card full">
-          <h3>Recovery Directives</h3>
-          <div id="recoveryDashboard"></div>
-        </div>
+        <div class="card full"><h3>Recovery Directives</h3><div id="recoveryDashboard"></div></div>
       </div>
     </section>
 
@@ -637,44 +539,22 @@
             <button style="margin-top:24px">Commit Biometrics</button>
           </form>
         </div>
-        <div class="card half">
-          <h3>Mass Trajectory</h3>
-          <div class="chart-container">
-            <canvas id="bodyChart"></canvas>
-          </div>
-        </div>
+        <div class="card half"><h3>Mass Trajectory</h3><div class="chart-container"><canvas id="bodyChart"></canvas></div></div>
       </div>
     </section>
 
     <section id="achievements" class="page">
       <div class="grid">
-        <div class="card third">
-          <h3>Current Classification</h3>
-          <div class="big" id="rankName" style="color:var(--brand)">Beginner</div>
-          <div class="progress"><span id="rankProgress"></span></div>
-        </div>
-        <div class="card third">
-          <h3>Split Adherence Streak</h3>
-          <div class="big" id="streakCount">0</div>
-          <p class="muted small">Rest days algorithmically respected.</p>
-        </div>
-        <div class="card third">
-          <h3>Next Objective</h3>
-          <div id="nextMilestone" style="color:var(--accent); font-weight:600; margin-top:10px;">Log first session</div>
-        </div>
-        <div class="card full">
-          <h3>Badges & Honors</h3>
-          <div id="badgesGrid" class="grid" style="gap:16px; margin-top:0;"></div>
-        </div>
+        <div class="card third"><h3>Current Classification</h3><div class="big" id="rankName" style="color:var(--brand)">Beginner</div><div class="progress"><span id="rankProgress"></span></div></div>
+        <div class="card third"><h3>Split Adherence Streak</h3><div class="big" id="streakCount">0</div><p class="muted small">Rest days algorithmically respected.</p></div>
+        <div class="card third"><h3>Next Objective</h3><div id="nextMilestone" style="color:var(--accent); font-weight:600; margin-top:10px;">Log first session</div></div>
+        <div class="card full"><h3>Badges & Honors</h3><div id="badgesGrid" class="grid" style="gap:16px; margin-top:0;"></div></div>
       </div>
     </section>
 
     <section id="reports" class="page">
       <div class="grid">
-        <div class="card full">
-          <h3>Aggregated Analytics</h3>
-          <div id="monthlyReport" class="form-grid"></div>
-        </div>
+        <div class="card full"><h3>Aggregated Analytics</h3><div id="monthlyReport" class="form-grid"></div></div>
       </div>
     </section>
 
@@ -682,11 +562,11 @@
       <div class="grid">
         <div class="card full">
           <div class="statline">
-            <h3>Knowledge Base & Influencers</h3>
-            <button class="secondary" onclick="openModal('tipModal')">Store Knowledge</button>
+            <h3>Influencer Database (YOUTUBE LIVE)</h3>
+            <button class="secondary" onclick="fetchLiveYoutubeVideos()">Refresh Video Feed</button>
           </div>
-          <p class="muted small">Data aggregated from YouTube/Google logic frameworks.</p>
-          <div id="tipsLibrary" style="display:flex; flex-direction:column; gap:12px; margin-top: 16px;"></div>
+          <p class="muted small">Fetching latest fitness science from YouTube API.</p>
+          <div id="tipsLibrary" style="display:flex; flex-direction:column; gap:12px; margin-top: 16px;"><div class="empty">Click Refresh Video Feed to load YouTube API.</div></div>
         </div>
       </div>
     </section>
@@ -750,23 +630,20 @@
   </div>
 </div>
 
-<div class="modal" id="tipModal">
-  <div class="modal-box">
-    <div class="statline"><h3>Store Knowledge Data</h3><button class="secondary" style="padding:8px 16px; font-size:0.8rem;" onclick="closeModal('tipModal')">Close</button></div>
-    <form onsubmit="addTip(event)" class="form-grid" style="margin-top: 16px;">
-      <div class="field half"><label>Source Entity</label><input name="Name" required></div>
-      <div class="field half"><label>Platform/Medium</label><input name="Platform"></div>
-      <div class="field half"><label>Subject Vector</label><input name="Topic"></div>
-      <div class="field half"><label>Reference URI</label><input name="Link"></div>
-      <div class="field full"><label>Core Directives</label><textarea name="Advice" rows="4"></textarea></div>
-      <div class="field full"><button>Store Knowledge</button></div>
-    </form>
-  </div>
-</div>
-
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+/* =========================
+   API KEYS INJECTED
+========================= */
+const KEYS = {
+  apiNinjas: 'GHoNF3wzt9dEa9GRfd6H3asKzcN74d1e0KrOZ1ns',
+  spoonacular: 'a45d9823aedcdf3f504994bbcc85e7c8da1c9803',
+  youtube: 'AIzaSyBEA8_ZAR9bqKbdLVr1B4fD8ABlMxmajGk',
+  exerciseDB: '20879b7a43mshddfab18b9c2fbcfp192a05jsn44e0907b3cee',
+  usda: '1h1N0y9ACSq5LNhXdZXlAXpacLnVFexEkNWdl0gI'
+};
+
 /* =========================
    SVG ICON HELPERS
 ========================= */
@@ -787,12 +664,9 @@ const icons = {
   star: `<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
   chart: `<svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`,
   book: `<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
-  gear: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`
+  gear: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`
 };
 
-/* =========================
-   OMNIFIT TRACKER AI CONFIG
-========================= */
 let APP_SCRIPT_URL = localStorage.getItem('omnifit_app_url') || '';
 let MOCK_MODE = (localStorage.getItem('omnifit_mock_mode') || 'false') === 'true'; 
 const USER_ID = 'USER_001';
@@ -810,21 +684,120 @@ const navItems = [
   ['Config','settings',icons.gear,'DB Architecture']
 ];
 
-/* Real-world seeding data (to populate DB if empty) */
-const seedExercises = [
-  {ExerciseName:'Incline Dumbbell Curl',Category:'Hypertrophy',PrimaryMuscle:'Arms',SecondaryMuscles:'Forearms',Equipment:'Dumbbell',Difficulty:'Intermediate',BodyArea:'Upper Body'},
-  {ExerciseName:'Romanian Deadlift (RDL)',Category:'Hypertrophy',PrimaryMuscle:'Legs',SecondaryMuscles:'Glutes, Back',Equipment:'Barbell',Difficulty:'Intermediate',BodyArea:'Lower Body'},
-  {ExerciseName:'Barbell Squat',Category:'Strength',PrimaryMuscle:'Legs',SecondaryMuscles:'Glutes, Core',Equipment:'Barbell',Difficulty:'Advanced',BodyArea:'Lower Body'},
-  {ExerciseName:'Bench Press',Category:'Strength',PrimaryMuscle:'Chest',SecondaryMuscles:'Triceps, Shoulders',Equipment:'Barbell',Difficulty:'Intermediate',BodyArea:'Upper Body'},
-  {ExerciseName:'Cbum Shoulder Press',Category:'Hypertrophy',PrimaryMuscle:'Shoulders',SecondaryMuscles:'Triceps',Equipment:'Dumbbell',Difficulty:'Intermediate',BodyArea:'Upper Body'},
-  {ExerciseName:'Bent Over Row',Category:'Hypertrophy',PrimaryMuscle:'Back',SecondaryMuscles:'Biceps',Equipment:'Barbell',Difficulty:'Intermediate',BodyArea:'Upper Body'}
-].map((x,i)=>({...x, ExerciseID:'EX_'+Date.now()+i, LeaderboardEligible:'Yes'}));
+/* =========================
+   LIVE API FETCH FUNCTIONS
+========================= */
 
-const seedTips = [
-  {Name:'Dr. Mike Israetel',Platform:'YouTube',Topic:'Hypertrophy',Link:'https://youtube.com',Advice:'Full range of motion and a deep stretch under load are critical drivers of hypertrophy. Don\'t cut ROM to lift heavier.',Favorite:'Yes'},
-  {Name:'Chris Bumstead',Platform:'YouTube',Topic:'Shoulders',Link:'https://youtube.com',Advice:'Control the eccentric on lateral raises. Momentum takes tension away from the medial deltoid.',Favorite:'Yes'},
-  {Name:'Jeff Nippard',Platform:'YouTube',Topic:'Nutrition',Link:'https://youtube.com',Advice:'Protein distribution is nearly as important as total daily intake. Aim for 3-5 protein feedings spread across the day.',Favorite:'No'}
-].map((x,i)=>({...x, TipID:'TIP_'+Date.now()+i}));
+// 1. API-Ninjas Exercise Fetch
+async function searchLiveExercises() {
+  const query = document.getElementById('apiExerciseSearch').value;
+  if (!query) return toast('Please enter a search term', 'warning');
+  
+  document.getElementById('exerciseDb').innerHTML = '<div class="empty">Loading API Data...</div>';
+  
+  try {
+    const res = await fetch(`https://api.api-ninjas.com/v1/exercises?name=${query}`, {
+      method: 'GET', headers: { 'X-Api-Key': KEYS.apiNinjas }
+    });
+    if (!res.ok) throw new Error('Failed to fetch from API-Ninjas');
+    
+    const data = await res.json();
+    if (!data.length) {
+      document.getElementById('exerciseDb').innerHTML = '<div class="empty">No exercises found.</div>';
+      return;
+    }
+    
+    const html = `<table><thead><tr><th>Name</th><th>Muscle</th><th>Equipment</th><th>Difficulty</th><th>Instructions</th></tr></thead><tbody>
+      ${data.map(ex => `<tr>
+        <td style="color:var(--brand); font-weight:bold;">${ex.name}</td>
+        <td><span class="badge info">${ex.muscle}</span></td>
+        <td>${ex.equipment}</td>
+        <td>${ex.difficulty}</td>
+        <td style="font-size:0.8rem; line-height:1.4;">${ex.instructions.substring(0, 150)}...</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+    
+    document.getElementById('exerciseDb').innerHTML = html;
+    toast('Exercises loaded successfully');
+  } catch(e) {
+    document.getElementById('exerciseDb').innerHTML = `<div class="empty">API Error: ${e.message}</div>`;
+  }
+}
+
+// 2. Spoonacular Recipe Fetch
+async function searchLiveRecipes() {
+  const query = document.getElementById('apiRecipeSearch').value;
+  if (!query) return toast('Please enter a recipe search term', 'warning');
+  
+  document.getElementById('recipeLibrary').innerHTML = '<div class="empty">Querying Spoonacular DB...</div>';
+  
+  try {
+    const res = await fetch(`https://api.spoonacular.com/recipes/complexSearch?query=${query}&addRecipeNutrition=true&number=6&apiKey=${KEYS.spoonacular}`);
+    if (!res.ok) throw new Error('Spoonacular limit reached or failed');
+    
+    const data = await res.json();
+    if (!data.results.length) {
+      document.getElementById('recipeLibrary').innerHTML = '<div class="empty">No recipes found.</div>';
+      return;
+    }
+    
+    const html = `<div class="grid" style="margin-top:0;">
+      ${data.results.map(r => {
+        const pro = r.nutrition.nutrients.find(n => n.name === 'Protein')?.amount || 0;
+        const cal = r.nutrition.nutrients.find(n => n.name === 'Calories')?.amount || 0;
+        const carbs = r.nutrition.nutrients.find(n => n.name === 'Carbohydrates')?.amount || 0;
+        const fat = r.nutrition.nutrients.find(n => n.name === 'Fat')?.amount || 0;
+        
+        return `<div class="card quarter" style="padding:16px;">
+          <img src="${r.image}" alt="${r.title}" style="width:100%; border-radius:8px; margin-bottom:12px;">
+          <h3 style="font-size:0.9rem; line-height:1.2; color:#fff;">${r.title}</h3>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">
+            <span class="badge info">${Math.round(cal)} kcal</span>
+            <span class="badge success">Pro: ${Math.round(pro)}g</span>
+            <span class="badge warning">Carbs: ${Math.round(carbs)}g</span>
+            <span class="badge danger">Fat: ${Math.round(fat)}g</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+    
+    document.getElementById('recipeLibrary').innerHTML = html;
+    toast('Recipes loaded successfully');
+  } catch(e) {
+    document.getElementById('recipeLibrary').innerHTML = `<div class="empty">API Error: ${e.message}</div>`;
+  }
+}
+
+// 3. YouTube API Fetch
+async function fetchLiveYoutubeVideos() {
+  document.getElementById('tipsLibrary').innerHTML = '<div class="empty">Connecting to YouTube API...</div>';
+  
+  try {
+    // Hardcoded to Dr. Mike Israetel / Renaissance Periodization for demonstration
+    const channelId = 'UCe1jD3H4Rj4lGeq5jC71Kcw';
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${KEYS.youtube}&channelId=${channelId}&part=snippet,id&order=date&maxResults=5`);
+    if (!res.ok) throw new Error('YouTube quota exceeded or failed');
+    
+    const data = await res.json();
+    
+    const html = data.items.filter(item => item.id.videoId).map(item => `
+      <div class="notice" style="border-left: 3px solid var(--brand); display:flex; flex-direction:row; gap:16px;">
+        <img src="${item.snippet.thumbnails.default.url}" style="width:120px; height:90px; border-radius:8px; object-fit:cover;">
+        <div>
+          <strong style="display:block; margin-bottom:4px; font-size:1rem;">${item.snippet.title}</strong>
+          <span class="small muted" style="display:block; margin-bottom:8px;">Channel: ${item.snippet.channelTitle}</span>
+          <a href="https://www.youtube.com/watch?v=${item.id.videoId}" target="_blank" class="badge info" style="text-decoration:none;">Watch Video</a>
+        </div>
+      </div>
+    `).join('');
+    
+    document.getElementById('tipsLibrary').innerHTML = html;
+    toast('Latest Influencer videos synced');
+  } catch (e) {
+    document.getElementById('tipsLibrary').innerHTML = `<div class="empty">API Error: ${e.message}</div>`;
+  }
+}
+
 
 /* =========================
    STORAGE + GOOGLE SHEETS
@@ -892,8 +865,6 @@ function switchTab(tabId){
   document.body.classList.remove('sidebar-open');
   
   if(tabId==='calendar') generateWorkoutCalendar();
-  if(tabId==='exercises') renderExerciseDatabase();
-  if(tabId==='learn') renderTips();
   if(tabId==='reports') renderMonthlyReport();
   if(tabId==='achievements') generateAchievements();
   updateDashboard();
@@ -986,15 +957,12 @@ async function handleFormSubmit(e,sheet){e.preventDefault(); const data=formData
 async function handlePlanSubmit(e){e.preventDefault();const data=formData(e.target);data.PlanID=uid('PLAN');await saveToSheet('Workout_Plans',data);toast('Protocol Saved');e.target.reset();renderPlans();generateWorkoutCalendar();}
 async function handleWorkoutSubmit(e){
   e.preventDefault(); const base=formData(e.target); base.LogID=uid('LOG'); base.Duration_min=document.getElementById('durationOutput').value; 
-  
   try {
     await saveToSheet('Workout_Logs',base);
     const rows=[...document.querySelectorAll('.exercise-row')].map(r=>{const o={};r.querySelectorAll('input,select,textarea').forEach(i=>o[i.name]=i.value);return {...o,EntryID:uid('EXE'),LogID:base.LogID,UserID:USER_ID,Date:base.Date}});
     for(const row of rows) await saveToSheet('Workout_Exercises',row);
     toast('Telemetry Logged'); e.target.reset(); document.getElementById('exerciseRows').innerHTML=''; addExerciseRow(); updateDashboard();
-  } catch(err) {
-    toast('Save Failed: ' + err.message, 'danger');
-  }
+  } catch(err) { toast('Save Failed: ' + err.message, 'danger'); }
 }
 async function handlePRSubmit(e){e.preventDefault();const data=formData(e.target);data.PRID=uid('PR');data.Estimated1RM=calculate1RM(data.Weight,data.Reps).toFixed(1);const prs=await loadFromSheet('PR_History');const prev=prs.filter(p=>p.Exercise===data.Exercise).sort((a,b)=>Number(b.Estimated1RM)-Number(a.Estimated1RM))[0];data.PreviousPR=prev?.Estimated1RM||0;data.Change=(Number(data.Estimated1RM)-Number(data.PreviousPR)).toFixed(1);await saveToSheet('PR_History',data);toast('Milestone Registered');e.target.reset();updateDashboard();}
 async function handleMealSubmit(e){e.preventDefault();const rows=[...document.querySelectorAll('.meal-row')].map(r=>{const o={};r.querySelectorAll('input,select').forEach(i=>o[i.name]=i.value);return {...o,MealID:uid('MEAL'),UserID:USER_ID}});for(const row of rows) await saveToSheet('Nutrition_Logs',row);toast('Nutrition committed');document.getElementById('mealRows').innerHTML='';addMealRow();updateDashboard();}
@@ -1032,7 +1000,6 @@ async function updateDashboard(){
   document.getElementById('proteinBar').style.width=Math.min(100,protein/160*100)+'%';
   document.getElementById('mealCompletion').innerHTML=['Breakfast','Lunch','Dinner'].map(m=>`<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);"><span>${m}</span> <span class="badge ${todayMeals.some(x=>x.MealType===m)?'success':'warning'}">${todayMeals.some(x=>x.MealType===m)?'Verified':'Pending'}</span></div>`).join('');
   
-  // Specific Macro Dashboards
   const todayFats = todayMeals.reduce((s,m)=>s+Number(m.Fats||0),0);
   const todaySodium = todayMeals.reduce((s,m)=>s+Number(m.Sodium||0),0);
   const todayChol = todayMeals.reduce((s,m)=>s+Number(m.Cholesterol||0),0);
@@ -1048,7 +1015,7 @@ async function updateDashboard(){
   document.getElementById('recoveryDashboard').innerHTML = recovery.length ? recovery.slice(-3).reverse().map(r=>`<div class="notice" style="border-left: 4px solid ${r.RecoveryScore>60?'var(--accent)':'var(--danger)'}"><strong>${r.Date}: ${r.RecoveryScore}/100 - ${r.OvertrainingRisk} Risk</strong><span class="muted small" style="margin-top:6px;">Action: ${r.DeloadRecommendation==='Recommended'?'Execute deload protocol immediately.':'Progression authorized.'}</span></div>`).join('') : '<div class="empty">No recovery telemetry detected.</div>';
 
   renderWorkoutHistory(logs); renderPRHistory(prs); renderMealHistory(meals); renderCharts(exs,logs,prs,body); renderMuscleHeatmap(exs); runActionableIntelligence({logs,exs,meals,sleeps,waters,recovery});
-  renderPlans(); renderExerciseDatabase(); generateAchievements(); renderMonthlyReport(); renderTips();
+  renderPlans(); generateAchievements(); renderMonthlyReport(); 
 }
 
 function avg(arr){arr=arr.filter(Boolean);return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0}
@@ -1091,32 +1058,8 @@ function calculateSplitBasedStreak(logs){let streak=0;logs.slice().reverse().for
 ========================= */
 function openModal(id){document.getElementById(id).classList.add('active')}
 function closeModal(id){document.getElementById(id).classList.remove('active')}
-async function addExerciseToDatabase(e){e.preventDefault();const data=formData(e.target);data.ExerciseID=uid('EX');await saveToSheet('Exercise_Database',data);toast('Movement Registered');closeModal('exerciseModal');e.target.reset();renderExerciseDatabase();}
-async function renderExerciseDatabase(){
-  let data=await loadFromSheet('Exercise_Database');
-  if(!data.length){
-    for(let ex of seedExercises){ await saveToSheet('Exercise_Database', ex); }
-    data=await loadFromSheet('Exercise_Database');
-  }
-  const q=(document.getElementById('exerciseSearch')?.value||'').toLowerCase(), muscle=document.getElementById('exerciseMuscleFilter')?.value||'All';
-  const list=data.filter(e=>(!q||JSON.stringify(e).toLowerCase().includes(q))&&(muscle==='All'||e.PrimaryMuscle===muscle||e.BodyArea===muscle));
-  
-  const lb = list.filter(e => e.LeaderboardEligible === 'Yes');
-  let html = lb.length ? `<div class="notice" style="margin-bottom: 24px;"><strong style="color:var(--warn)">Leaderboard Movements</strong><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">${lb.map(e=>`<span class="badge warning">${e.ExerciseName}</span>`).join('')}</div></div>` : '';
-  
-  html += list.length?table(['Designation','Vector','Apparatus','Level','Leaderboard'],list.map(e=>[e.ExerciseName,e.PrimaryMuscle,e.Equipment,e.Difficulty,e.LeaderboardEligible])):'<div class="empty">No movements match query.</div>';
-  document.getElementById('exerciseDb').innerHTML = html;
-}
+async function addExerciseToDatabase(e){e.preventDefault();const data=formData(e.target);data.ExerciseID=uid('EX');await saveToSheet('Exercise_Database',data);toast('Movement Registered');closeModal('exerciseModal');e.target.reset();}
 async function addRecipe(e){e.preventDefault();const data=formData(e.target);data.RecipeID=uid('REC');await saveToSheet('Recipes',data);toast('Formulation stored');closeModal('recipeModal');e.target.reset();}
-async function addTip(e){e.preventDefault();const data=formData(e.target);data.TipID=uid('TIP');await saveToSheet('Learn_Tips',data);toast('Knowledge Stored');closeModal('tipModal');e.target.reset();renderTips();}
-async function renderTips(){
-  let tips=await loadFromSheet('Learn_Tips');
-  if(!tips.length){
-    for(let t of seedTips){ await saveToSheet('Learn_Tips', t); }
-    tips=await loadFromSheet('Learn_Tips');
-  }
-  document.getElementById('tipsLibrary').innerHTML=tips.length?tips.map(t=>`<div class="notice" style="border-left: 3px solid ${t.Favorite==='Yes'?'var(--warn)':'var(--brand)'}"><strong>${t.Topic || 'General'} — ${t.Name || 'Source'}</strong><span class="small muted" style="margin-bottom:8px; display:block;">${t.Platform || ''} ${t.Link?`<a href="${t.Link}" target="_blank" style="color:var(--brand)">[External Link]</a>`:''}</span><p style="margin:8px 0; font-style:italic; line-height:1.6; color:var(--soft);">"${t.Advice||''}"</p></div>`).join(''):'<div class="empty">No intelligence blocks saved.</div>';
-}
 
 /* =========================
    CHARTS + HEATMAPS
@@ -1195,8 +1138,6 @@ async function generateAchievements(){
 async function renderMonthlyReport(){
   const [logs,exs,meals,sleeps,recovery]=await Promise.all(['Workout_Logs','Workout_Exercises','Nutrition_Logs','Sleep_Logs','Recovery_Logs'].map(loadFromSheet));
   const totalVolume=exs.reduce((s,e)=>s+Number(e.Volume||0),0);
-  
-  // Calculate Sets per Muscle Group
   const muscleSets={};exs.forEach(e=>muscleSets[e.MuscleGroup||e.PrimaryMuscle||'Other']=(muscleSets[e.MuscleGroup||e.PrimaryMuscle||'Other']||0)+Number(e.Sets||0));
   const muscleOutput = Object.entries(muscleSets).map(([k,v]) => `<span class="badge">${k}: ${v} sets</span>`).join(' ');
 
@@ -1238,7 +1179,7 @@ function startTimer(seconds) {
 window.addEventListener('DOMContentLoaded',async()=>{
   renderNav(); document.getElementById('appScriptUrl').value=APP_SCRIPT_URL; document.getElementById('mockMode').checked=MOCK_MODE; document.getElementById('modeLabel').textContent=MOCK_MODE?'LOCAL STORAGE':'SHEETS SYNC'; document.getElementById('modeBadge').textContent = MOCK_MODE?'Mock':'Active';
   const today=new Date().toISOString().slice(0,10); document.querySelectorAll('input[type="date"]').forEach(i=>{if(!i.value)i.value=today}); document.getElementById('calendarMonth').value=today.slice(0,7);
-  addExerciseRow(); addMealRow(); updateDashboard(); generateWorkoutCalendar(); renderTips();
+  addExerciseRow(); addMealRow(); updateDashboard(); generateWorkoutCalendar();
 });
 </script>
 </body>
