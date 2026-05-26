@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FITNESS — Premium Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     /* --- FITNESS UI — CLEAN MODERN SYSTEM --- */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;700&display=swap');
@@ -336,6 +337,31 @@
       stroke-linejoin: round;
     }
 
+
+    /* --- REQUESTED UX REWORK: THEME PAGES + COMPACT DATA ENTRY --- */
+    .sub-nav-wrap { margin: -10px 0 22px; display:flex; gap:10px; align-items:center; overflow-x:auto; padding-bottom:4px; }
+    .sub-nav-wrap button { white-space:nowrap; background:rgba(255,255,255,.055); color:var(--muted); border-radius:999px; padding:10px 15px; }
+    .sub-nav-wrap button.active { background:linear-gradient(135deg,var(--brand),var(--brand2)); color:#fff; }
+    .compact-entry { padding:16px!important; margin:12px 0!important; }
+    .compact-entry .form-grid { grid-template-columns:repeat(12,1fr); gap:12px; align-items:end; }
+    .nutrition-auto-preview { display:grid; grid-template-columns:repeat(8,minmax(70px,1fr)); gap:8px; margin-top:12px; }
+    .nutrition-chip { border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.035); padding:9px 10px; }
+    .nutrition-chip strong { display:block; color:#fff; font-size:.94rem; }
+    .nutrition-chip span { color:var(--muted); font-size:.72rem; }
+    .profile-view-card { display:none; gap:14px; }
+    .profile-view-card.active { display:grid; }
+    .profile-info-grid { display:grid; grid-template-columns:repeat(4,minmax(140px,1fr)); gap:12px; margin-top:14px; }
+    .profile-info-item { background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.075); border-radius:16px; padding:14px; }
+    .profile-info-item span { display:block; color:var(--muted); font-size:.74rem; text-transform:uppercase; letter-spacing:.08em; }
+    .profile-info-item strong { display:block; color:#fff; margin-top:6px; }
+    .set-table-mini { width:100%; border-spacing:0 6px; min-width:520px; }
+    .set-table-mini td { padding:8px 10px; font-size:.82rem; }
+    .calendar-controls { display:grid; grid-template-columns:repeat(4,minmax(160px,1fr)); gap:12px; margin-bottom:16px; }
+    .import-zone { border:1px dashed rgba(239,35,60,.35); border-radius:18px; padding:14px; background:rgba(239,35,60,.045); }
+    .session-exercise-table { width:100%; border-spacing:0 7px; }
+    .session-exercise-table input { padding:9px 10px; border-radius:10px; }
+    @media(max-width:900px){.nutrition-auto-preview,.profile-info-grid,.calendar-controls{grid-template-columns:1fr 1fr}.sub-nav-wrap{margin-top:0}.compact-entry .field{grid-column:1/-1!important}}
+
     @media(max-width: 720px) {
       main { padding: 18px 16px 48px; }
       .topbar { margin: -18px -16px 18px; padding: 14px 16px; align-items:flex-start; flex-direction:column; }
@@ -432,6 +458,7 @@
         <button type="button" class="secondary" onclick="logout()" style="border-radius:99px;">Logout</button>
       </div>
     </div>
+    <div class="sub-nav-wrap" id="subNavBar"></div>
 
     <section id="dashboard" class="page active">
       <div class="hero-dashboard">
@@ -480,12 +507,16 @@
     <section id="profile" class="page">
       <div class="grid">
         <div class="card wide">
-          <h3>My Profile</h3><p class="muted small" style="margin-top:-8px;">Your profile stays saved after setup. Use Edit Details only when your body data or goals change.</p>
-          <form id="profileForm" onsubmit="handleFormSubmit(event,'Users')">
+          <h3>My Profile</h3><p class="muted small" style="margin-top:-8px;">Your profile stays saved after setup. Use Edit Profile only when your body data or goals change.</p>
+          <div id="profileViewCard" class="profile-view-card active">
+            <div class="profile-info-grid" id="profileViewGrid"></div>
+            <div class="toolbar"><button type="button" onclick="toggleProfileEdit(true)">Edit Profile</button><button type="button" class="secondary" onclick="loadLatestProfile()">Sync from Sheets</button></div>
+          </div>
+          <form id="profileForm" style="display:none;" onsubmit="handleFormSubmit(event,'Users')">
             <div class="form-grid">
               <div class="field full"><label>Full Name</label><input name="FullName" value="Palliyawattage Nikitha Chathu Keshan Gomes" required></div>
               <div class="field"><label>User ID</label><input name="UserID" value="USER_001" readonly style="color:var(--muted)"></div>
-              <div class="field"><label>Sex</label><select name="Sex"><option selected>Male</option><option>Female</option></select></div>
+              <div class="field"><label>Gender</label><select name="Gender"><option selected>Male</option><option>Female</option></select></div>
               <div class="field"><label>Country</label><input name="Country" value="Sri Lanka"></div>
               
               <div class="field"><label>Date of Birth</label><input type="date" name="DOB" id="dobInput" value="2003-10-27" onchange="calculateAge()"></div>
@@ -512,7 +543,7 @@
               <div class="field"><label>Dietary Preference</label><select name="DietPreference"><option>Meat based</option><option>Vegetarian</option><option>Vegan</option><option selected>Mixed (Pizza/Dairy included)</option></select></div>
               <div class="field full"><label>Profile Image URL</label><input type="url" name="PhotoURL" placeholder="https://..."></div>
             </div>
-            <div class="toolbar" style="margin-top:24px"><button>Save Profile</button><button type="button" class="secondary" onclick="toggleProfileEdit(false)">Lock Details</button><button type="button" class="secondary" onclick="toggleProfileEdit(true)">Edit Details</button><button type="button" class="secondary" onclick="loadLatestProfile()">Sync from Sheets</button></div>
+            <div class="toolbar" style="margin-top:24px"><button>Save Profile</button><button type="button" class="secondary" onclick="toggleProfileEdit(false)">Save & Lock Details</button><button type="button" class="secondary" onclick="toggleProfileEdit(true)">Edit Profile</button><button type="button" class="secondary" onclick="loadLatestProfile()">Sync from Sheets</button></div>
           </form>
         </div>
         <div class="card third">
@@ -526,13 +557,13 @@
     <section id="planner" class="page">
       <div class="grid">
         <div class="card half">
-          <h3>Create Split Architecture</h3>
+          <h3>Create Challenge / Event Starter</h3>
           <form onsubmit="handlePlanSubmit(event)">
             <div class="form-grid">
-              <div class="field half"><label>Protocol Name</label><input name="SplitName" required placeholder="e.g. 90-Day Hybrid Protocol"></div>
-              <div class="field half"><label>Commencement Date</label><input type="date" name="StartDate" required></div>
+              <div class="field half"><label>Challenge / Event Name</label><input name="SplitName" required placeholder="e.g. 90-Day Challenge / Boot Camp"></div>
+              <div class="field half"><label>Start Date</label><input type="date" name="StartDate" required></div>
               <div class="field full">
-                <label>Split Pattern Structure</label>
+                <label>Challenge Training Pattern</label>
                 <select name="PatternType" id="patternType" onchange="toggleCustomPattern()">
                   <option selected>3 workout days + 1 rest day</option><option>2 workout days + 1 rest day</option><option>5 days workout + 2 rest days</option><option>Custom repeating pattern</option>
                 </select>
@@ -540,10 +571,10 @@
               <div class="field full"><label>Sequence (JSON Array)</label><input name="PatternJSON" id="patternJson" value='["Push","Pull","Legs","Rest"]'></div>
               <div class="field half"><label>Active Status</label><select name="IsActive"><option>true</option><option>false</option></select></div>
             </div>
-            <button style="margin-top:24px">Deploy Protocol</button>
+            <button style="margin-top:24px">Start Challenge</button>
           </form>
         </div>
-        <div class="card half"><h3>Protocol History</h3><div id="plansTable" class="empty">System pending protocol data.</div></div>
+        <div class="card half"><h3>Challenge History</h3><div id="plansTable" class="empty">No challenge/event plan yet.</div></div>
       </div>
     </section>
 
@@ -570,15 +601,15 @@
           <h3>Add / Import Workout Schedule</h3>
           <form id="scheduleForm" onsubmit="handleScheduleSubmit(event)">
             <div class="form-grid">
-              <div class="field"><label>Schedule Name</label><input name="ScheduleName" required placeholder="e.g. Current Push Day / Old Bulk Routine"></div>
-              <div class="field"><label>Schedule Type</label><select name="ScheduleType"><option>Current</option><option>Old</option></select></div>
+              <div class="field"><label>Unique Schedule ID</label><input name="ScheduleCode" required placeholder="e.g. PUSH_2026_A"></div><div class="field"><label>Schedule Name</label><input name="ScheduleName" required placeholder="e.g. Current Push Day / Old Bulk Routine"></div>
+              <div class="field"><label>Status</label><select name="ScheduleStatus"><option>Active / Current</option><option>Inactive / Old</option></select></div><div class="field"><label>Schedule Type</label><select name="ScheduleType"><option>Current</option><option>Old</option></select></div>
               <div class="field"><label>Workout Name / Day</label><input name="WorkoutDayName" required placeholder="e.g. Push, Pull, Legs, Upper"></div>
               <div class="field"><label>Phase / Goal</label><input name="PhaseName" placeholder="e.g. Cut, Lean Bulk, Strength"></div>
               <div class="field"><label>Start Date</label><input type="date" name="StartDate"></div>
               <div class="field"><label>End Date</label><input type="date" name="EndDate"></div>
               <div class="field full"><label>Schedule Notes</label><input name="Notes" placeholder="Why you used this schedule, what changed, injuries, focus areas..."></div>
             </div>
-            <h3 style="margin-top: 28px; border-top: 1px solid var(--border); padding-top: 22px;">Exercises inside this schedule</h3>
+            <div class="import-zone" style="margin-top:22px;"><label>Import Exercises by Excel Sheet</label><input type="file" accept=".xlsx,.xls,.csv" onchange="importScheduleExcel(event)"><p class="small muted" style="margin:8px 0 0;">Columns supported: ExerciseName, MuscleGroup, Equipment, Sets, Reps, TargetLoad, RestSec, Tempo, Notes.</p></div><h3 style="margin-top: 28px; border-top: 1px solid var(--border); padding-top: 22px;">Exercises inside this schedule</h3>
             <div id="scheduleExerciseRows"></div>
             <div class="toolbar" style="margin-top:16px;">
               <button type="button" class="secondary" onclick="addScheduleExerciseRow()">Add Exercise</button>
@@ -590,7 +621,7 @@
     </section>
 
     <section id="calendar" class="page">
-      <div class="grid"><div class="card full"><div class="statline"><h3>Split Execution Calendar</h3><div class="toolbar"><input type="month" id="calendarMonth" onchange="generateWorkoutCalendar()"><button class="secondary" onclick="generateWorkoutCalendar()">Sync</button></div></div><div class="calendar" id="calendarGrid"></div></div></div>
+      <div class="grid"><div class="card full"><div class="statline"><h3>Training Calendar Sync</h3><div class="toolbar"><input type="month" id="calendarMonth" onchange="generateWorkoutCalendar()"><button class="secondary" onclick="generateWorkoutCalendar()">Sync Schedules</button></div></div><div class="calendar-controls"><div><label>Workout/Rest Cycle</label><select id="calendarCycle" onchange="generateWorkoutCalendar()"><option value="3:1">3 workout days + 1 rest day</option><option value="2:1">2 workout days + 1 rest day</option><option value="5:2">5 workout days + 2 rest days</option></select></div><div><label>Calendar Source</label><select id="calendarSource" onchange="generateWorkoutCalendar()"><option value="auto">Auto: Challenge + Active Schedules</option><option value="schedules">Active Schedules Only</option><option value="challenge">Challenge Starter Only</option></select></div><div><label>Rest Label</label><input id="restLabel" value="Rest / Recovery Day" oninput="generateWorkoutCalendar()"></div><div><label>Sync Status</label><input id="calendarSyncStatus" readonly value="Ready"></div></div><div class="calendar" id="calendarGrid"></div></div></div>
     </section>
 
     <section id="workoutLogs" class="page">
@@ -600,8 +631,8 @@
           <form onsubmit="handleWorkoutSubmit(event)">
             <div class="form-grid">
               <div class="field"><label>Date</label><input type="date" name="Date" required></div>
-              <div class="field"><label>Scheduled Day</label><input name="ScheduledWorkout" placeholder="Auto-fills from Calendar"></div>
-              <div class="field"><label>Actual Execution</label><input name="ActualWorkout" placeholder="What you actually trained"></div>
+              <div class="field"><label>Today's Available Schedule</label><select name="ScheduledWorkout" id="todayWorkoutSelect" onchange="loadTodayScheduleSelection()"><option value="">Auto-detecting...</option></select></div>
+              <div class="field"><label>Actual Execution</label><input name="ActualWorkout" placeholder="What you actually trained"></div><input type="hidden" name="ScheduleID" id="sessionScheduleID">
               <div class="field"><label>Session Status</label><select name="Status"><option>Completed</option><option>Skipped</option><option>Missed</option><option>Moved / Delayed</option><option>Rest day</option></select></div>
               <div class="field"><label>Start Time</label><input type="time" name="StartTime" id="startTime" onchange="calculateWorkoutDuration()"></div>
               <div class="field"><label>End Time</label><input type="time" name="EndTime" id="endTime" onchange="calculateWorkoutDuration()"></div>
@@ -627,7 +658,7 @@
               <div class="field half"><label>Movement</label><input name="Exercise" list="exerciseSuggestions" oninput="applyExerciseSuggestion(this)" placeholder="e.g. Barbell Squat" required></div>
               <div class="field half"><label>Date</label><input type="date" name="Date" required></div>
               <div class="field quarter"><label>Load (kg)</label><input type="number" step="0.5" name="Weight" required></div>
-              <div class="field quarter"><label>Repetitions</label><input type="number" name="Reps" required></div>
+              <div class="field quarter"><label>Repetitions</label><input type="number" name="Reps" required></div><div class="field half"><label>Maximum Volume Level (kg)</label><input type="number" step="0.5" name="MaxVolume" placeholder="Best total volume for this workout"></div>
               <div class="field full"><label>Notes</label><input name="Notes" placeholder="optional milestone notes"></div>
             </div>
             <button style="margin-top:24px">Commit Record</button>
@@ -679,16 +710,26 @@
     <section id="nutrition" class="page">
       <div class="grid">
         <div class="card full">
-          <h3>Nutritional Intake Log</h3>
+          <div class="statline">
+            <div>
+              <h3>Automated Intake Log</h3>
+              <p class="muted small" style="margin:0;">Enter only food, amount, meal type, and time. Calories, macros, sugar, fiber, sodium, cholesterol, and potassium are estimated automatically and shown as bars.</p>
+            </div>
+            <button type="button" class="secondary" onclick="addMealRow()">Add Food Item</button>
+          </div>
           <form onsubmit="handleMealSubmit(event)">
             <div id="mealRows"></div>
-            <div class="toolbar" style="margin-top:16px;"><button type="button" class="secondary" onclick="addMealRow()">Add Food Item</button><button>Commit Nutrition Data</button></div>
+            <div class="toolbar" style="margin-top:16px;"><button>Commit Nutrition Data</button></div>
           </form>
+        </div>
+        <div class="card full">
+          <h3>Nutrition Visual Summary</h3>
+          <div class="chart-container" style="height:300px;"><canvas id="nutritionBarChart"></canvas></div>
         </div>
         <div class="card third"><h3>Energy Balance (kcal)</h3><div class="big" id="caloriesToday">0</div><div class="progress"><span id="calorieBar"></span></div></div>
         <div class="card third"><h3>Protein Synthesis (g)</h3><div class="big" id="proteinToday" style="color:var(--brand)">0g</div><div class="progress"><span id="proteinBar"></span></div></div>
-        <div class="card third"><h3>Protocol Compliance</h3><div id="mealCompletion" style="display:flex; flex-direction:column; gap:8px;"></div></div>
-        <div class="card full"><h3>Intake Ledger</h3><div id="mealHistory"></div></div>
+        <div class="card third"><h3>Meal Completion</h3><div id="mealCompletion" style="display:flex; flex-direction:column; gap:8px;"></div></div>
+        <div class="card full"><h3>Compact Intake Ledger</h3><div id="mealHistory"></div></div>
       </div>
     </section>
 
@@ -700,7 +741,7 @@
             <div class="field half"><label>Mass (kg)</label><input id="calcWeightKg" type="number" oninput="nutritionCalculator()"></div>
             <div class="field half"><label>Height (cm)</label><input id="calcHeightCm" type="number" oninput="nutritionCalculator()"></div>
             <div class="field half"><label>Age</label><input id="calcAge" type="number" oninput="nutritionCalculator()"></div>
-            <div class="field half"><label>Sex</label><select id="calcSex" onchange="nutritionCalculator()"><option>Male</option><option>Female</option></select></div>
+            <div class="field half"><label>Gender</label><select id="calcGender" onchange="nutritionCalculator()"><option>Male</option><option>Female</option></select></div>
             <div class="field half"><label>Activity</label><select id="calcActivity" onchange="nutritionCalculator()"><option>Sedentary</option><option>Light</option><option selected>Moderate</option><option>Active</option><option>Very active</option></select></div>
             <div class="field half"><label>Objective</label><select id="calcGoal" onchange="nutritionCalculator()"><option>Fat loss / cutting</option><option>Lean bulk</option><option>Maintenance</option></select></div>
           </div>
@@ -874,11 +915,24 @@ const icons = {
 };
 
 const navItems = [
-  ['System','dashboard',icons.dash,'Overview'],['System','profile',icons.user,'My Profile'],
-  ['Training','planner',icons.plan,'Protocol Planner'],['Training','schedules',icons.plan,'Workout Schedules'],['Training','calendar',icons.cal,'Execution Calendar'],
-  ['Training','workoutLogs',icons.weight,'Session Entry'],['Training','prs',icons.trophy,'Records & 1RM'],['Training','intelligence',icons.brain,'AI Intelligence'],
-  ['Database','library',icons.db,'Database Hub'],['Nutrition','nutrition',icons.food,'Intake Logs'],['Nutrition','calculator',icons.calc,'Biometric Calc'],
-  ['Recovery','recovery',icons.sleep,'Sleep & Recovery'],['Analytics','body',icons.ruler,'Measurements'],['Analytics','reports',icons.chart,'Aggregated Reports']
+  ['System','dashboard',icons.dash,'Overview'],
+  ['System','profile',icons.user,'My Profile'],
+  ['Training','planner',icons.plan,'Challenge Starter'],
+  ['Training','schedules',icons.plan,'Workout Schedules'],
+  ['Training','calendar',icons.cal,'Calendar'],
+  ['Training','workoutLogs',icons.weight,'Session Entry'],
+  ['Training','prs',icons.trophy,'Records & 1RM'],
+  ['Training','recovery',icons.sleep,'Sleep & Recovery'],
+  ['Nutrition','nutrition',icons.food,'Intake Logs'],
+  ['Nutrition','calculator',icons.calc,'Biometric Calc'],
+  ['Database','library',icons.db,'Database Hub']
+];
+
+const navGroups = [
+  ['System','dashboard',icons.dash],
+  ['Training','planner',icons.weight],
+  ['Nutrition','nutrition',icons.food],
+  ['Database','library',icons.db]
 ];
 
 /* =========================
@@ -1075,31 +1129,45 @@ function uid(prefix){return prefix + '_' + Date.now().toString(36) + Math.random
 ========================= */
 function renderNav(filter=''){
   const nav = document.getElementById('navList');
+  if(!nav) return;
   nav.innerHTML = '';
-  let current='';
-  navItems.filter(i=>i[3].toLowerCase().includes(filter.toLowerCase()) || i[0].toLowerCase().includes(filter.toLowerCase())).forEach(item=>{
-    if(item[0]!==current){current=item[0]; nav.insertAdjacentHTML('beforeend',`<div class="nav-section">${current}</div>`)}
-    nav.insertAdjacentHTML('beforeend',`<button class="nav-item ${item[1]==='dashboard'?'active':''}" data-tab="${item[1]}" onclick="switchTab('${item[1]}')">${item[2]} <span>${item[3]}</span></button>`);
+  navGroups.filter(g=>g[0].toLowerCase().includes(filter.toLowerCase()) || navItems.some(i=>i[0]===g[0] && i[3].toLowerCase().includes(filter.toLowerCase()))).forEach(group=>{
+    nav.insertAdjacentHTML('beforeend',`<button class="nav-item ${group[1]==='dashboard'?'active':''}" data-main="${group[0]}" data-tab="${group[1]}" onclick="switchMainTheme('${group[0]}')">${group[2]} <span>${group[0]}</span></button>`);
   });
+  renderSubNav('System');
 }
 function filterNav(v){renderNav(v)}
+function switchMainTheme(groupName){
+  const first = navItems.find(i=>i[0]===groupName)?.[1] || 'dashboard';
+  switchTab(first);
+}
+function renderSubNav(activeGroup){
+  const sub = document.getElementById('subNavBar');
+  if(!sub) return;
+  const children = navItems.filter(i=>i[0]===activeGroup);
+  sub.innerHTML = children.map(i=>`<button type="button" data-tab="${i[1]}" onclick="switchTab('${i[1]}')">${i[2]} <span>${i[3]}</span></button>`).join('');
+}
 function switchTab(tabId){
+  const target = document.getElementById(tabId);
+  if(!target) return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));
+  target.classList.add('active');
   const item = navItems.find(i=>i[1]===tabId);
+  const activeGroup = item ? item[0] : 'System';
+  renderSubNav(activeGroup);
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.main===activeGroup));
+  document.querySelectorAll('#subNavBar button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));
   document.getElementById('pageTitle').textContent = item ? item[3] : 'FITNESS';
   document.getElementById('pageSubtitle').textContent = pageSubtitle(tabId);
   document.body.classList.remove('sidebar-open');
-  
+
   if(tabId==='calendar') generateWorkoutCalendar();
   if(tabId==='schedules') renderScheduleManager();
-  if(tabId==='reports') renderMonthlyReport();
-  if(tabId==='achievements') generateAchievements();
+  if(tabId==='workoutLogs') populateTodayWorkoutSelector();
   updateDashboard();
 }
 function pageSubtitle(id){
-  return {dashboard:'Last 30 Days Telemetry',profile:'Identity & Physics Variables',planner:'Active Protocol Configuration',schedules:'Current & Old Workout Library',calendar:'Algorithm-Based Rest Detection',workoutLogs:'Entry & Execution Logs',prs:'1RM Mathematics',intelligence:'Fatigue & Deficit Detection',exercises:'Library & Heatmap Integration',nutrition:'Macros & Micronutrients',calculator:'TDEE & Physics Target Engine',recipes:'Culinary Formulations',recovery:'CNS Readiness & Score',body:'Trajectory Log',achievements:'Gamification Status',reports:'Aggregated Data',learn:'External Knowledge Base'}[id] || '';
+  return {dashboard:'Last 30 Days Telemetry',profile:'Locked profile view with edit controls',planner:'Challenges, boot camps, and training events',schedules:'Current & Old Workout Library',calendar:'Schedule sync with rest/recovery cycles',workoutLogs:'Today-based session logging',prs:'Workout-wise records and maximum volume',nutrition:'Automated nutrition estimation with visual bars',calculator:'TDEE & target engine',recovery:'Sleep and recovery inside Training',library:'Exercise, recipe, and creator databases'}[id] || '';
 }
 
 /* =========================
@@ -1121,7 +1189,7 @@ function calculateTDEE(bmr, activity){return bmr*({Sedentary:1.2,Light:1.375,Mod
 function calculateProteinTarget(weight, goal){let multi = goal?.includes('Fat loss')?2.2:goal?.includes('bulk')?2.0:1.8; return Math.round((Number(weight)||0)*multi)}
 function updateCalculatorPreview(){
   const w=Number(document.getElementById('weightInput')?.value||0), h=Number(document.getElementById('heightInput')?.value||0), age=calculateAge(), goal=document.getElementById('goalInput')?.value, act=document.getElementById('activityInput')?.value;
-  const bmi=calculateBMI(w,h), bmr=calculateBMR(w,h,age,document.querySelector('[name="Sex"]')?.value||'Male'), tdee=calculateTDEE(bmr,act), protein=calculateProteinTarget(w,goal);
+  const bmi=calculateBMI(w,h), bmr=calculateBMR(w,h,age,document.querySelector('[name="Gender"]')?.value||'Male'), tdee=calculateTDEE(bmr,act), protein=calculateProteinTarget(w,goal);
   document.getElementById('bmiPreview').textContent=bmi?bmi.toFixed(1):'0.0';
   document.getElementById('tdeePreview').textContent=tdee?Math.round(tdee):'0';
   document.getElementById('proteinPreview').textContent=protein+'g';
@@ -1149,7 +1217,7 @@ function calculateRecoveryScore(d){
 function calc1RMWidget(){const rm=calculate1RM(document.getElementById('oneWeight').value,document.getElementById('oneReps').value);document.getElementById('oneRM').textContent=rm?rm.toFixed(1):'0.0'}
 function warmupCalculator(){const w=Number(document.getElementById('warmupWeight').value);document.getElementById('warmupOutput').innerHTML=w?`<strong style="color:var(--brand)">40% × 8:</strong> ${(w*.4).toFixed(0)}kg<br><strong style="color:var(--brand)">60% × 5:</strong> ${(w*.6).toFixed(0)}kg<br><strong style="color:var(--brand)">75% × 3:</strong> ${(w*.75).toFixed(0)}kg<br><strong style="color:var(--brand)">90% × 1:</strong> ${(w*.9).toFixed(0)}kg`:'Awaiting input...'}
 function nutritionCalculator(){
-  const w=Number(calcWeightKg.value),h=Number(calcHeightCm.value),age=Number(calcAge.value),sex=calcSex.value,act=calcActivity.value,goal=calcGoal.value;
+  const w=Number(calcWeightKg.value),h=Number(calcHeightCm.value),age=Number(calcAge.value),sex=getCalcGenderValue(),act=calcActivity.value,goal=calcGoal.value;
   const bmi=calculateBMI(w,h),bmr=calculateBMR(w,h,age,sex),tdee=calculateTDEE(bmr,act);
   const calories = goal.includes('Fat loss') ? tdee-400 : goal.includes('bulk') ? tdee+250 : tdee;
   const protein=calculateProteinTarget(w,goal), fats=Math.round(w*.8), carbs=Math.round((calories-(protein*4+fats*9))/4);
@@ -1312,7 +1380,7 @@ async function renderScheduleManager(){
     return `<div class="routine-card full">
       <div class="routine-head">
         <div>
-          <span class="badge ${String(s.ScheduleType).toLowerCase()==='current'?'success':'info'}">${escapeHtml(s.ScheduleType||'Schedule')}</span>
+          <span class="badge ${isActiveSchedule(s)?'success':'info'}">${escapeHtml(s.ScheduleStatus||s.ScheduleType||'Schedule')}</span>
           <h3 style="margin:12px 0 6px; color:#fff;">${escapeHtml(s.ScheduleName||'Untitled Schedule')}</h3>
           <div class="small muted">${escapeHtml(s.WorkoutDayName||'Workout')} ${s.PhaseName ? '· '+escapeHtml(s.PhaseName) : ''}</div>
         </div>
@@ -1356,9 +1424,9 @@ function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;');}
 
 function addMealRow(){const today=new Date().toISOString().slice(0,10);document.getElementById('mealRows').insertAdjacentHTML('beforeend',`<div class="card full meal-row" style="padding:20px; margin:16px 0; background: var(--bg);"><div class="form-grid"><div class="field"><label>Date</label><input type="date" name="Date" value="${today}" required></div><div class="field"><label>Type</label><select name="MealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option><option>Pre-workout</option><option>Post-workout</option></select></div><div class="field"><label>Time</label><input name="Time" type="time"></div><div class="field"><label>Meal / Food</label><input name="FoodName" list="foodSuggestions" oninput="estimateMealRow(this.closest('.meal-row'))" required></div><div class="field"><label>Quantity</label><input name="Quantity" placeholder="1 plate / 1 cup"></div><div class="field"><label>Serving Grams</label><input name="Weight_g" type="number" value="100" oninput="estimateMealRow(this.closest('.meal-row'))"></div><div class="field"><label>Kcal</label><input name="Calories" type="number"></div><div class="field"><label>Pro (g)</label><input name="Protein" type="number"></div><div class="field"><label>Carb (g)</label><input name="Carbs" type="number"></div><div class="field"><label>Fat (g)</label><input name="Fats" type="number"></div><div class="field"><label>Sugar (g)</label><input name="Sugar" type="number"></div><div class="field"><label>Fiber (g)</label><input name="Fiber" type="number"></div><div class="field"><label>Sodium (mg)</label><input name="Sodium" type="number"></div><div class="field"><label>Cholesterol (mg)</label><input name="Cholesterol" type="number"></div><div class="field"><label>Potassium (mg)</label><input name="Potassium" type="number"></div><div class="field"><label>Source</label><input name="Source" readonly placeholder="Auto/manual"></div><div class="field full"><label>Notes</label><input name="Notes"></div></div><button type="button" class="secondary" style="margin-top:16px; padding:10px 16px; font-size:.75rem;" onclick="this.closest('.meal-row').remove()">Remove Item</button></div>`)}
 
-async function handleFormSubmit(e,sheet){e.preventDefault(); const data=formData(e.target); if(sheet==='Users') data.Age=calculateAge(); await saveToSheet(sheet,data); toast(sheet==='Users'?'Profile saved':'Saved to '+sheet); if(sheet==='Users') toggleProfileEdit(false); updateDashboard();}
+async function handleFormSubmit(e,sheet){e.preventDefault(); const data=formData(e.target); if(sheet==='Users'){ data.Age=calculateAge(); data.Gender=data.Gender||''; } await saveToSheet(sheet,data); toast(sheet==='Users'?'Profile saved':'Saved to '+sheet); if(sheet==='Users') toggleProfileEdit(false); updateDashboard();}
 function toggleProfileEdit(enable=true){document.querySelectorAll('#profileForm input:not([name="UserID"]),#profileForm select,#profileForm textarea').forEach(el=>el.disabled=!enable);}
-async function handlePlanSubmit(e){e.preventDefault();const data=formData(e.target);data.PlanID=uid('PLAN');await saveToSheet('Workout_Plans',data);toast('Protocol Saved');e.target.reset();renderPlans();generateWorkoutCalendar();}
+async function handlePlanSubmit(e){e.preventDefault();const data=formData(e.target);data.PlanID=uid('PLAN');await saveToSheet('Workout_Plans',data);toast('Challenge saved and calendar synced');e.target.reset();renderPlans();generateWorkoutCalendar();}
 async function handleWorkoutSubmit(e){
   e.preventDefault(); const base=formData(e.target); base.LogID=uid('LOG'); base.Duration_min=document.getElementById('durationOutput').value; 
   try {
@@ -1419,7 +1487,7 @@ async function updateDashboard(){
     </div>
     ${[
       ['Execution Rate', consistency+'%', `${completed} completed · ${missed} missed · ${moved} moved`, consistency, icons.chart, consistency >= 75 ? 'success' : 'warning'],
-      ['Current Protocol', activePlan?.SplitName || 'No protocol', activePlan?.PatternType || 'Awaiting assignment', 100, icons.plan, 'info'],
+      ['Current Challenge', activePlan?.SplitName || 'No protocol', activePlan?.PatternType || 'Awaiting assignment', 100, icons.plan, 'info'],
       ['Workout Streak', streakDays+' Days', 'Split-based streak tracking', Math.min(100, streakDays * 10), icons.trophy, streakDays > 0 ? 'success' : 'warning'],
       ['Load Volume', Math.round(volume).toLocaleString()+' kg', `${sets} sets · ${reps} reps`, Math.min(100,volume/10000*100), icons.weight, 'danger'],
       ['Nutrition Targets', Math.round(protein)+'g protein', `${Math.round(calories)} kcal · ${Math.round(proteinPct)}% protein target`, proteinPct, icons.food, proteinPct >= 75 ? 'success' : 'warning'],
@@ -1440,12 +1508,12 @@ async function updateDashboard(){
   const todaySugar = todayMeals.reduce((s,m)=>s+Number(m.Sugar||0),0);
   const todayFiber = todayMeals.reduce((s,m)=>s+Number(m.Fiber||0),0);
   
-  document.getElementById('macroSpecialDash').innerHTML = `
+  if(document.getElementById('macroSpecialDash')) document.getElementById('macroSpecialDash').innerHTML = `
     <div class="field half"><div class="notice" style="height:100%;"><strong style="color:var(--danger)">Heart Healthy</strong><span class="small muted" style="line-height:1.8; margin-top:8px;">Fats: ${todayFats}g<br>Sodium: ${todaySodium}mg<br>Cholesterol: ${todayChol}mg</span></div></div>
     <div class="field half"><div class="notice" style="height:100%;"><strong style="color:var(--brand)">Low Carb Status</strong><span class="small muted" style="line-height:1.8; margin-top:8px;">Carbs: ${todayCarbs}g<br>Sugar: ${todaySugar}g<br>Fiber: ${todayFiber}g</span></div></div>
   `;
 
-  document.getElementById('recoveryDashboard').innerHTML = recovery.length ? recovery.slice(-3).reverse().map(r=>`<div class="notice" style="border-left: 4px solid ${r.RecoveryScore>60?'var(--accent)':'var(--danger)'}"><strong>${r.Date}: ${r.RecoveryScore}/100 - ${r.OvertrainingRisk} Risk</strong><span class="muted small" style="margin-top:6px;">Action: ${r.DeloadRecommendation==='Recommended'?'Execute deload protocol immediately.':'Progression authorized.'}</span></div>`).join('') : '<div class="empty">No recovery telemetry detected.</div>';
+  if(document.getElementById('recoveryDashboard')) document.getElementById('recoveryDashboard').innerHTML = recovery.length ? recovery.slice(-3).reverse().map(r=>`<div class="notice" style="border-left: 4px solid ${r.RecoveryScore>60?'var(--accent)':'var(--danger)'}"><strong>${r.Date}: ${r.RecoveryScore}/100 - ${r.OvertrainingRisk} Risk</strong><span class="muted small" style="margin-top:6px;">Action: ${r.DeloadRecommendation==='Recommended'?'Execute deload protocol immediately.':'Progression authorized.'}</span></div>`).join('') : '<div class="empty">No recovery telemetry detected.</div>';
 
   renderWorkoutHistory(logs); renderPRHistory(prs); renderMealHistory(meals); renderCharts(exs,logs,prs,body); renderMuscleHeatmap(exs); runActionableIntelligence({logs,exs,meals,sleeps,waters,recovery});
   renderPlans(); renderMonthlyReport(); renderLibraryHub(); 
@@ -1457,7 +1525,7 @@ function renderPRHistory(prs){renderPRDashboard(prs)}
 function renderMealHistory(meals){document.getElementById('mealHistory').innerHTML=meals.length?table(['Date','Type','Item','Kcal','Pro','Fats','Sugar','Fiber','Sodium'],meals.slice(-12).reverse().map(m=>[m.Date,m.MealType,m.FoodName,m.Calories,m.Protein,m.Fats,m.Sugar,m.Fiber,m.Sodium||m.Sodium_mg])):'<div class="empty">No intake logged.</div>'}
 function renderPRDashboard(data){const prs=data||window.__LATEST_PRS||[];window.__LATEST_PRS=prs;const sel=document.getElementById('prWorkoutFilter');if(sel){const current=sel.value||'All';const types=['All',...new Set(prs.map(p=>p.WorkoutType||'Uncategorized'))];sel.innerHTML=types.map(t=>`<option ${t===current?'selected':''}>${escapeHtml(t)}</option>`).join('');}const filter=sel?.value||'All';const rows=filter==='All'?prs:prs.filter(p=>(p.WorkoutType||'Uncategorized')===filter);document.getElementById('prHistory').innerHTML=rows.length?table(['Workout','Movement','Date','Load','Reps','1RM','Delta'],rows.slice(-20).reverse().map(p=>[p.WorkoutType||'Uncategorized',p.Exercise,p.Date,p.Weight,p.Reps,p.Estimated1RM,p.Change])):'<div class="empty">No milestones for this workout.</div>';chart('prChart','line',{labels:rows.map(p=>p.Date).slice(-10),datasets:[{label:(filter==='All'?'All Workouts':filter)+' 1RM',data:rows.map(p=>p.Estimated1RM).slice(-10),borderColor:'#10B981',tension:0.4}]});}
 function table(headers,rows){return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c??''}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
-async function renderPlans(){const plans=await loadFromSheet('Workout_Plans');document.getElementById('plansTable').innerHTML=plans.length?table(['Protocol','Initiation','Architecture','Active'],plans.slice().reverse().map(p=>[p.SplitName,p.StartDate,p.PatternType,p.IsActive])):'<div class="empty">No active protocols.</div>'}
+async function renderPlans(){const plans=await loadFromSheet('Workout_Plans');document.getElementById('plansTable').innerHTML=plans.length?table(['Challenge','Start Date','Pattern','Active'],plans.slice().reverse().map(p=>[p.SplitName,p.StartDate,p.PatternType,p.IsActive])):'<div class="empty">No active challenge plans.</div>'}
 
 /* =========================
    CALENDAR + DETECTION
@@ -1537,8 +1605,8 @@ function runActionableIntelligence(data={}){
   if(under) notices.push([`Underutilized Vector: ${under}`,'Weekly set volume is beneath maintenance threshold.','Atrophy.','Integrate 3-5 working sets into next protocol.','info']);
   if(!notices.length) notices.push(['System Optimal','All telemetry within acceptable parameters.','Sustained progression.','Maintain current output trajectory.','success']);
 
-  document.getElementById('aiNotices').innerHTML=notices.map(n=>`<div class="card third metric-card"><div class="metric-head"><span class="badge ${n[4]}">${n[4].toUpperCase()}</span><span class="metric-icon">${icons.brain}</span></div><h3 style="margin:16px 0 8px; color:#fff;">${n[0]}</h3><p class="small muted" style="margin:6px 0; line-height:1.6;"><strong>Root:</strong> ${n[1]}</p><p class="small muted" style="margin:6px 0; line-height:1.6;"><strong>Risk:</strong> ${n[2]}</p><p class="small" style="margin:12px 0 0; color:var(--brand); line-height:1.6;"><strong>Directive:</strong> ${n[3]}</p></div>`).join('');
-  document.getElementById('intelligenceNotices').innerHTML=notices.map(n=>`<div class="notice"><strong style="margin-bottom:8px;">${n[0]}</strong><div class="small muted" style="line-height:1.8;"><span style="color:var(--danger)">Risk:</span> ${n[2]} <br> <span style="color:var(--brand)">Directive:</span> ${n[3]}</div></div>`).join('');
+  if(document.getElementById('aiNotices')) document.getElementById('aiNotices').innerHTML=notices.map(n=>`<div class="card third metric-card"><div class="metric-head"><span class="badge ${n[4]}">${n[4].toUpperCase()}</span><span class="metric-icon">${icons.brain}</span></div><h3 style="margin:16px 0 8px; color:#fff;">${n[0]}</h3><p class="small muted" style="margin:6px 0; line-height:1.6;"><strong>Root:</strong> ${n[1]}</p><p class="small muted" style="margin:6px 0; line-height:1.6;"><strong>Risk:</strong> ${n[2]}</p><p class="small" style="margin:12px 0 0; color:var(--brand); line-height:1.6;"><strong>Directive:</strong> ${n[3]}</p></div>`).join('');
+  if(document.getElementById('intelligenceNotices')) document.getElementById('intelligenceNotices').innerHTML=notices.map(n=>`<div class="notice"><strong style="margin-bottom:8px;">${n[0]}</strong><div class="small muted" style="line-height:1.8;"><span style="color:var(--danger)">Risk:</span> ${n[2]} <br> <span style="color:var(--brand)">Directive:</span> ${n[3]}</div></div>`).join('');
   
   const trend=exs.slice(-10).reduce((s,e)=>s+Number(e.Volume||0),0), prior=exs.slice(-20,-10).reduce((s,e)=>s+Number(e.Volume||0),0);
   document.getElementById('overloadScore').textContent = prior ? Math.round((trend-prior)/prior*100)+'%' : '0%';
@@ -1583,8 +1651,219 @@ function startTimer(seconds) {
   }, 1000);
 }
 
+
+/* =========================
+   REQUESTED PROCESS OVERRIDES
+========================= */
+function getCalcGenderValue(){ return document.getElementById('calcGender')?.value || 'Male'; }
+
+function refreshProfileView(){
+  const form=document.getElementById('profileForm'), grid=document.getElementById('profileViewGrid');
+  if(!form||!grid) return;
+  const data=formData(form);
+  const items=[
+    ['Full Name',data.FullName],['User ID',data.UserID],['Gender',data.Gender],['Country',data.Country],
+    ['Age',data.Age||calculateAge()],['Height',data.Height_cm?data.Height_cm+' cm':'-'],['Weight',data.Weight_kg?data.Weight_kg+' kg':'-'],['Goal',data.Goal],
+    ['Activity',data.ActivityLevel],['Experience',data.ExperienceLevel],['Diet',data.DietPreference],['Photo Mode',data.PhotoProcessing]
+  ];
+  grid.innerHTML=items.map(([k,v])=>`<div class="profile-info-item"><span>${escapeHtml(k)}</span><strong>${escapeHtml(v||'-')}</strong></div>`).join('');
+}
+function toggleProfileEdit(enable=true){
+  const form=document.getElementById('profileForm'), view=document.getElementById('profileViewCard');
+  if(!form||!view) return;
+  form.style.display=enable?'block':'none';
+  view.classList.toggle('active',!enable);
+  form.querySelectorAll('input:not([name="UserID"]),select,textarea').forEach(el=>el.disabled=!enable);
+  if(!enable) refreshProfileView();
+}
+
+function addMealRow(){
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('mealRows').insertAdjacentHTML('beforeend',`<div class="card full meal-row compact-entry" style="background:var(--bg);">
+    <div class="form-grid">
+      <div class="field"><label>Date</label><input type="date" name="Date" value="${today}" required></div>
+      <div class="field"><label>Meal Type</label><select name="MealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option><option>Pre-workout</option><option>Post-workout</option></select></div>
+      <div class="field"><label>Time</label><input name="Time" type="time"></div>
+      <div class="field half"><label>Food / Meal</label><input name="FoodName" list="foodSuggestions" placeholder="e.g. rice, chicken, banana, eggs" oninput="estimateMealRow(this.closest('.meal-row'))" required></div>
+      <div class="field"><label>Quantity</label><input name="Quantity" placeholder="1 plate / 2 eggs"></div>
+      <div class="field"><label>Serving Grams</label><input name="Weight_g" type="number" value="100" oninput="estimateMealRow(this.closest('.meal-row'))"></div>
+      <input type="hidden" name="Calories"><input type="hidden" name="Protein"><input type="hidden" name="Carbs"><input type="hidden" name="Fats">
+      <input type="hidden" name="Sugar"><input type="hidden" name="Fiber"><input type="hidden" name="Sodium"><input type="hidden" name="Cholesterol"><input type="hidden" name="Potassium"><input type="hidden" name="Source">
+      <div class="field full"><label>Auto Nutrition Preview</label><div class="nutrition-auto-preview"></div></div>
+      <div class="field full"><label>Notes</label><input name="Notes" placeholder="Optional"></div>
+    </div>
+    <button type="button" class="secondary" style="margin-top:12px; padding:9px 14px; font-size:.75rem;" onclick="this.closest('.meal-row').remove();renderLiveNutritionBars();">Remove Item</button>
+  </div>`);
+  estimateMealRow(document.getElementById('mealRows').lastElementChild);
+}
+function estimateMealRow(row){
+  if(!row) return;
+  const name=String(row.querySelector('[name="FoodName"]')?.value||'').toLowerCase();
+  const grams=Number(row.querySelector('[name="Weight_g"],[name="ServingGrams"]')?.value||100)||100;
+  const key=Object.keys(FOOD_NUTRITION_DB).find(k=>name.includes(k));
+  const src=key?FOOD_NUTRITION_DB[key]:{Calories:0,Protein:0,Carbs:0,Fats:0,Sugar:0,Fiber:0,Sodium:0,Cholesterol:0,Potassium:0};
+  const factor=grams/100;
+  ['Calories','Protein','Carbs','Fats','Sugar','Fiber','Sodium','Cholesterol','Potassium'].forEach(k=>{
+    const val=Math.round((Number(src[k]||0))*factor*10)/10;
+    const el=row.querySelector(`[name="${k}"],[name="${k}_mg"]`); if(el) el.value=val;
+  });
+  const source=row.querySelector('[name="Source"]'); if(source) source.value=key?'Auto estimate: '+key:'Auto estimate pending';
+  row.classList.toggle('auto-estimate',!!key);
+  const preview=row.querySelector('.nutrition-auto-preview');
+  if(preview){
+    const vals=['Calories','Protein','Carbs','Fats','Sugar','Fiber','Sodium','Potassium'].map(k=>[k,row.querySelector(`[name="${k}"]`)?.value||0,k==='Calories'?'kcal':(k==='Sodium'||k==='Potassium'?'mg':'g')]);
+    preview.innerHTML=vals.map(([k,v,u])=>`<div class="nutrition-chip"><strong>${escapeHtml(v)}${u}</strong><span>${escapeHtml(k)}</span></div>`).join('');
+  }
+  renderLiveNutritionBars();
+}
+function renderLiveNutritionBars(extraMeals=[]){
+  const rows=[...document.querySelectorAll('.meal-row')].map(r=>{
+    estimateMealRowNoRender(r);
+    const o={}; r.querySelectorAll('input,select,textarea').forEach(i=>o[i.name]=i.value); return o;
+  }).concat(extraMeals||[]);
+  const totals=['Calories','Protein','Carbs','Fats','Sugar','Fiber','Sodium','Cholesterol','Potassium'].map(k=>rows.reduce((s,m)=>s+Number(m[k]||m[k+'_mg']||0),0));
+  chart('nutritionBarChart','bar',{labels:['Kcal','Protein','Carbs','Fats','Sugar','Fiber','Sodium','Chol.','Potassium'],datasets:[{label:'Today / current entry',data:totals}]},{plugins:{legend:{display:false}}});
+}
+function estimateMealRowNoRender(row){
+  if(!row) return;
+  const name=String(row.querySelector('[name="FoodName"]')?.value||'').toLowerCase();
+  const grams=Number(row.querySelector('[name="Weight_g"],[name="ServingGrams"]')?.value||100)||100;
+  const key=Object.keys(FOOD_NUTRITION_DB).find(k=>name.includes(k));
+  if(!key) return;
+  const src=FOOD_NUTRITION_DB[key], factor=grams/100;
+  ['Calories','Protein','Carbs','Fats','Sugar','Fiber','Sodium','Cholesterol','Potassium'].forEach(k=>{const el=row.querySelector(`[name="${k}"],[name="${k}_mg"]`); if(el)el.value=Math.round((src[k]||0)*factor*10)/10;});
+  const source=row.querySelector('[name="Source"]'); if(source) source.value='Auto estimate: '+key;
+}
+function renderMealHistory(meals){
+  const box=document.getElementById('mealHistory'); if(!box) return;
+  box.innerHTML=meals.length?table(['Date','Type','Food','Kcal','Protein','Macros','Micros'],meals.slice(-12).reverse().map(m=>[
+    m.Date,m.MealType,m.FoodName,m.Calories,`${m.Protein||0}g`,
+    `C ${m.Carbs||0}g · F ${m.Fats||0}g`,
+    `Sugar ${m.Sugar||0}g · Fiber ${m.Fiber||0}g · Sodium ${m.Sodium||m.Sodium_mg||0}mg`
+  ])):'<div class="empty">No intake logged.</div>';
+  renderLiveNutritionBars(meals.filter(m=>m.Date===new Date().toISOString().slice(0,10)));
+}
+
+function isActiveSchedule(s){return String(s.ScheduleStatus||s.Status||s.ScheduleType||'').toLowerCase().includes('active')||String(s.ScheduleStatus||s.Status||s.ScheduleType||'').toLowerCase().includes('current')}
+function getCyclePattern(){
+  const val=document.getElementById('calendarCycle')?.value||'3:1';
+  const [w,r]=val.split(':').map(Number);
+  return {workoutDays:w||3, restDays:r||1};
+}
+async function generateWorkoutCalendar(){
+  const grid=document.getElementById('calendarGrid'); if(!grid) return;
+  const [plans,logs,schedules]=await Promise.all(['Workout_Plans','Workout_Logs','Workout_Schedules'].map(loadFromSheet));
+  const source=document.getElementById('calendarSource')?.value||'auto';
+  const activeSchedules=schedules.filter(isActiveSchedule);
+  const plan=plans.find(p=>String(p.IsActive).toLowerCase()==='true') || plans.at(-1);
+  const monthVal=document.getElementById('calendarMonth')?.value || new Date().toISOString().slice(0,7);
+  const [y,m]=monthVal.split('-').map(Number), days=new Date(y,m,0).getDate();
+  const today=new Date().toISOString().slice(0,10);
+  const restLabel=document.getElementById('restLabel')?.value||'Rest / Recovery Day';
+  const cycle=getCyclePattern();
+  grid.innerHTML='';
+  for(let d=1;d<=days;d++){
+    const date=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let planned='No schedule';
+    if((source==='challenge'||source==='auto') && plan) planned=getPlannedWorkout(plan,date);
+    if((source==='schedules'||source==='auto') && activeSchedules.length){
+      const offset=Math.max(0,Math.floor((new Date(date)-new Date(activeSchedules[0].StartDate||`${y}-${String(m).padStart(2,'0')}-01`))/86400000));
+      const cycleLen=cycle.workoutDays+cycle.restDays;
+      if(offset % cycleLen >= cycle.workoutDays) planned=restLabel;
+      else planned=(activeSchedules[offset % activeSchedules.length].WorkoutDayName || activeSchedules[offset % activeSchedules.length].ScheduleName || 'Workout');
+    }
+    const log=logs.find(l=>l.Date===date);
+    const cls=log?.Status==='Completed'?'completed':planned.toLowerCase().includes('rest')?'rest':(log?.Status==='Missed'?'missed':'');
+    grid.insertAdjacentHTML('beforeend',`<div class="day ${cls} ${date===today?'today':''}" data-date="${date}" data-workout="${escapeAttr(planned)}"><strong>${d}</strong><span class="small muted">${escapeHtml(planned)}</span><br>${log?`<span class="badge success" style="margin-top:8px;">${escapeHtml(log.Status)}</span>`:''}</div>`);
+  }
+  const st=document.getElementById('calendarSyncStatus'); if(st) st.value=`Synced ${activeSchedules.length} active/current schedule(s)`;
+}
+async function populateTodayWorkoutSelector(){
+  const select=document.getElementById('todayWorkoutSelect'); if(!select) return;
+  const [schedules,plans]=await Promise.all(['Workout_Schedules','Workout_Plans'].map(loadFromSheet));
+  const today=new Date().toISOString().slice(0,10);
+  const active=schedules.filter(isActiveSchedule);
+  const plan=plans.find(p=>String(p.IsActive).toLowerCase()==='true') || plans.at(-1);
+  const plannedFromChallenge=plan?getPlannedWorkout(plan,today):'';
+  const options=[];
+  active.forEach(s=>options.push({id:s.ScheduleID,name:s.WorkoutDayName||s.ScheduleName, label:`${s.WorkoutDayName||s.ScheduleName} — ${s.ScheduleCode||s.ScheduleID||'schedule'}`}));
+  if(plannedFromChallenge && !plannedFromChallenge.toLowerCase().includes('rest')) options.unshift({id:'',name:plannedFromChallenge,label:`Calendar: ${plannedFromChallenge}`});
+  if(!options.length) options.push({id:'',name:'',label:'No active/current schedule for today'});
+  select.innerHTML=options.map(o=>`<option value="${escapeAttr(o.name)}" data-id="${escapeAttr(o.id)}">${escapeHtml(o.label)}</option>`).join('');
+  loadTodayScheduleSelection();
+}
+async function loadTodayScheduleSelection(){
+  const select=document.getElementById('todayWorkoutSelect'); if(!select) return;
+  const opt=select.selectedOptions[0]; const scheduleId=opt?.dataset.id||'';
+  document.getElementById('sessionScheduleID').value=scheduleId;
+  const actual=document.querySelector('#workoutLogs [name="ActualWorkout"]'); if(actual) actual.value=select.value||'';
+  if(scheduleId) await loadScheduleIntoSession(scheduleId);
+}
+function addExerciseRow(){
+  const id=uid('ROW');
+  document.getElementById('exerciseRows').insertAdjacentHTML('beforeend',`<div class="card full exercise-row compact-entry" data-row="${id}" style="background: var(--bg);">
+    <div class="table-wrap"><table class="session-exercise-table"><thead><tr><th>Workout</th><th>Muscle</th><th>Sets</th><th>Reps</th><th>Weight / Set</th><th>Volume</th><th></th></tr></thead>
+    <tbody><tr>
+      <td><input name="ExerciseName" list="exerciseSuggestions" oninput="applyExerciseSuggestion(this)" required></td>
+      <td><input name="MuscleGroup" placeholder="Auto" readonly></td>
+      <td><input name="Sets" type="number" oninput="rowVolume(this)"></td>
+      <td><input name="Reps" placeholder="12/10/8" oninput="rowVolume(this)"></td>
+      <td><input name="WeightUsed" type="number" step="0.5" oninput="rowVolume(this)" placeholder="kg"></td>
+      <td><input name="Volume" readonly style="color:var(--brand); background: var(--panel);"></td>
+      <td><button type="button" class="secondary" onclick="this.closest('.exercise-row').remove()">Remove</button></td>
+    </tr></tbody></table></div>
+    <div class="form-grid" style="margin-top:10px;">
+      <div class="field"><label>Equipment</label><input name="Equipment" readonly></div>
+      <div class="field"><label>RPE</label><input name="RPE" type="number" min="1" max="10"></div>
+      <div class="field"><label>Tempo</label><input name="Tempo" placeholder="3-1-1"></div>
+      <div class="field"><label>Rest (sec)</label><input name="RestTime" placeholder="90"></div>
+      <div class="field full"><label>Set Notes</label><input name="Notes" placeholder="Set-by-set weight/volume notes"></div>
+      <input type="hidden" name="SupersetGroup"><input type="hidden" name="DropSet" value="No"><input type="hidden" name="WarmupSet" value="No">
+    </div>
+  </div>`);
+}
+function applyExerciseSuggestion(input){
+  const ex=EXERCISE_LIBRARY.find(e=>String(e.ExerciseName).toLowerCase()===String(input.value).toLowerCase()) || EXERCISE_LIBRARY.find(e=>String(input.value).toLowerCase().includes(String(e.ExerciseName).toLowerCase()));
+  const row=input.closest('.exercise-row,.schedule-exercise-row');
+  const muscle=ex?.PrimaryMuscle || inferMuscleFromExercise(input.value);
+  if(row){
+    const m=row.querySelector('[name="MuscleGroup"]'); if(m && !m.value) m.value=muscle||'';
+    const eq=row.querySelector('[name="Equipment"]'); if(eq && !eq.value) eq.value=ex?.Equipment||'';
+  }
+}
+function rowVolume(el){
+  const row=el.closest('.exercise-row'); if(!row) return;
+  const sets=Number(row.querySelector('[name="Sets"]')?.value||0);
+  const repsRaw=String(row.querySelector('[name="Reps"]')?.value||'');
+  const repsParts=repsRaw.split(/[\/, ]+/).map(Number).filter(n=>!isNaN(n));
+  const reps=repsParts.length?repsParts.reduce((a,b)=>a+b,0):(Number(repsRaw)||0)*sets;
+  const wt=Number(row.querySelector('[name="WeightUsed"]')?.value||0);
+  const vol=Math.round(reps*wt);
+  const out=row.querySelector('[name="Volume"]'); if(out) out.value=vol||'';
+}
+async function handleWorkoutSubmit(e){
+  e.preventDefault(); const base=formData(e.target); base.LogID=uid('LOG'); base.Duration_min=document.getElementById('durationOutput').value;
+  try{
+    await saveToSheet('Workout_Logs',base);
+    const rows=[...document.querySelectorAll('.exercise-row')].map(r=>{const o={};r.querySelectorAll('input,select,textarea').forEach(i=>o[i.name]=i.value);o.MuscleGroup=o.MuscleGroup||inferMuscleFromExercise(o.ExerciseName);return {...o,EntryID:uid('EXE'),LogID:base.LogID,UserID:USER_ID,Date:base.Date,ScheduleID:base.ScheduleID}});
+    for(const row of rows) await saveToSheet('Workout_Exercises',row);
+    toast('Session logged and calendar updated'); e.target.reset(); document.getElementById('exerciseRows').innerHTML=''; addExerciseRow(); generateWorkoutCalendar(); updateDashboard();
+  }catch(err){toast('Save Failed: '+err.message,'danger');}
+}
+async function importScheduleExcel(event){
+  const file=event.target.files?.[0]; if(!file) return;
+  if(!window.XLSX){toast('Excel importer failed to load','danger');return;}
+  const buf=await file.arrayBuffer();
+  const wb=XLSX.read(buf,{type:'array'});
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+  const wrap=document.getElementById('scheduleExerciseRows'); if(wrap) wrap.innerHTML='';
+  rows.forEach(r=>addScheduleExerciseRow({ExerciseName:r.ExerciseName||r.Exercise||r.Workout,MuscleGroup:r.MuscleGroup||r.Muscle,Equipment:r.Equipment,Sets:r.Sets||r.SetCount||3,WeightUsed:r.TargetLoad||r.WeightUsed||r.Weight,Tempo:r.Tempo,Notes:r.Notes,SetsData:String(r.Reps||r.TargetReps||'').split(/[\/,]+/).filter(Boolean).map((x,i)=>({SetNumber:i+1,TargetReps:String(x).trim(),TargetLoad:r.TargetLoad||r.Weight||'',RestSec:r.RestSec||r.Rest||''}))}));
+  toast(`${rows.length} exercise row(s) imported`);
+}
+
 window.addEventListener('DOMContentLoaded',async()=>{
-  renderNav();
+  renderNav(); refreshProfileView(); toggleProfileEdit(false);
   const today=new Date().toISOString().slice(0,10); 
   document.querySelectorAll('input[type="date"]').forEach(i=>{if(!i.value)i.value=today}); 
   document.getElementById('calendarMonth').value=today.slice(0,7);
