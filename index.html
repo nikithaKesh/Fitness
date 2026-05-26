@@ -11,26 +11,26 @@
     
     :root {
       /* Matte Black Theme */
-      --bg: #0a0a0a; 
-      --bg2: #141414; 
-      --panel: #141414; 
-      --panel-hover: #262626;
-      --border: #27272a; 
+      --bg: #070707; 
+      --bg2: #0d0d0f; 
+      --panel: #121214; 
+      --panel-hover: #1f1113;
+      --border: #2b2022; 
       --text: #f8fafc; 
       --muted: #a1a1aa; 
       --soft: #d4d4d8;
       
-      /* Vibrant Blue Accents */
-      --brand: #3b82f6; 
-      --brand2: #2563eb; 
-      --brand-glow: rgba(59, 130, 246, 0.4);
-      --accent: #10b981; 
+      /* Matte Black + Red Accents */
+      --brand: #ef233c; 
+      --brand2: #9f1239; 
+      --brand-glow: rgba(239, 35, 60, 0.42);
+      --accent: #22c55e; 
       --warn: #f59e0b; 
       --danger: #ef4444; 
       
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3); 
-      --radius: 16px; 
-      --radius2: 8px;
+      --radius: 22px; 
+      --radius2: 14px;
       --font-main: 'Inter', sans-serif; 
       --font-display: 'Oswald', sans-serif;
     }
@@ -40,8 +40,8 @@
     body {
       margin: 0; min-height: 100vh; color: var(--text); font-family: var(--font-main);
       background-color: var(--bg);
-      background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.05), transparent 25%),
-                        radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.05), transparent 25%);
+      background-image: radial-gradient(circle at 15% 50%, rgba(239, 35, 60, 0.08), transparent 28%),
+                        radial-gradient(circle at 85% 30%, rgba(159, 18, 57, 0.10), transparent 26%);
       overflow-x: hidden;
       line-height: 1.5;
     }
@@ -227,10 +227,122 @@
     /* --- MANUAL LIBRARY + PROFILE + SMART LOGGING --- */
     .library-tabs{display:inline-flex;gap:6px;padding:5px;border:1px solid var(--border);border-radius:999px;background:var(--bg);flex-wrap:wrap}.library-tabs button{background:transparent;color:var(--muted);border-radius:999px;padding:9px 14px}.library-tabs button.active{background:var(--brand);color:#fff}.library-panel{display:none}.library-panel.active{display:block}.visual-card{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);padding:18px;display:grid;gap:10px}.visual-card:hover{border-color:rgba(59,130,246,.7);transform:translateY(-1px)}.link-list{display:flex;gap:8px;flex-wrap:wrap}.link-list a{color:var(--brand);border:1px solid rgba(59,130,246,.35);border-radius:999px;padding:5px 9px;text-decoration:none;font-size:.78rem}.micro-grid{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px}.micro-stat{border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--panel)}.micro-stat strong{display:block;color:#fff;font-size:1rem}.auto-estimate{border-left:4px solid var(--brand)}.body-map.real-human{align-items:start}.body-map.real-human svg{max-width:280px}.heatmap-shell{display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:18px;align-items:center;width:100%}.heatmap-list{display:grid;gap:8px}.heatmap-list div{display:flex;justify-content:space-between;gap:12px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:var(--panel)}@media(max-width:720px){.micro-grid,.heatmap-shell{grid-template-columns:1fr}}
 
+
+
+    /* --- MATTE BLACK + RED FITNESS APP UPGRADE LAYER --- */
+    body::before, body::after {
+      content: ""; position: fixed; inset: auto auto -18vh -12vw; width: 42vw; height: 42vw;
+      background: radial-gradient(circle, rgba(239,35,60,.18), transparent 62%);
+      filter: blur(12px); opacity: .75; pointer-events: none; z-index: -1; animation: driftGlow 14s ease-in-out infinite alternate;
+    }
+    body::after { inset: 8vh -12vw auto auto; width: 34vw; height: 34vw; opacity: .5; animation-duration: 18s; }
+    @keyframes driftGlow { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(36px,-28px,0) scale(1.12); } }
+    .app { background: linear-gradient(135deg, rgba(239,35,60,.07), transparent 26%), linear-gradient(180deg, rgba(255,255,255,.025), transparent 36%), var(--bg); }
+    aside { background: rgba(12,12,14,.82); backdrop-filter: blur(20px); box-shadow: inset -1px 0 rgba(255,255,255,.03); }
+    .topbar { background: rgba(7,7,7,.58); backdrop-filter: blur(18px) saturate(130%); border-bottom: 1px solid rgba(239,35,60,.18); box-shadow: 0 18px 60px rgba(0,0,0,.28); }
+    .logo, .auth-tabs button.active, .section-tabs button.active, .library-tabs button.active { background: linear-gradient(135deg, var(--brand), var(--brand2)); box-shadow: 0 0 24px var(--brand-glow); }
+    .brand p, .big, a, .link-list a { color: var(--brand); }
+    .profile-mini-card { display:flex; align-items:center; gap:12px; padding:14px; margin:-12px 0 22px; border:1px solid rgba(239,35,60,.24); border-radius:20px; background:linear-gradient(135deg, rgba(239,35,60,.12), rgba(255,255,255,.03)); box-shadow:0 16px 45px rgba(0,0,0,.28); }
+    .profile-mini-card strong { display:block; color:#fff; line-height:1.2; }
+    .profile-mini-card small { display:flex; align-items:center; gap:7px; color:var(--muted); margin-top:4px; }
+    .avatar-ring { width:44px; height:44px; border-radius:50%; display:grid; place-items:center; padding:2px; background:conic-gradient(from 120deg, var(--brand), transparent, var(--brand2), var(--brand)); }
+    .avatar-ring span { width:100%; height:100%; display:grid; place-items:center; border-radius:50%; background:#111; color:#fff; font-weight:800; font-size:.85rem; }
+    .status-dot { width:8px; height:8px; display:inline-block; border-radius:999px; background:var(--brand); box-shadow:0 0 14px var(--brand), 0 0 28px var(--brand-glow); }
+    .nav-item { border-radius:16px; position:relative; overflow:hidden; }
+    .nav-item:hover { background:rgba(239,35,60,.08); border-color:rgba(239,35,60,.16); }
+    .nav-item.active { border-left:0; border-radius:18px; padding-left:16px; background:linear-gradient(135deg, rgba(239,35,60,.2), rgba(255,255,255,.035)); color:#fff; box-shadow:inset 0 0 0 1px rgba(239,35,60,.28), 0 12px 34px rgba(239,35,60,.08); }
+    .nav-item.active::before { content:""; width:4px; position:absolute; left:0; top:12px; bottom:12px; border-radius:99px; background:var(--brand); box-shadow:0 0 16px var(--brand); }
+    .card, .visual-card, .routine-card, .notice, .empty, .day, .modal-box, .auth-card { border:1px solid transparent; background:linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(145deg, rgba(239,35,60,.35), rgba(255,255,255,.06), rgba(239,35,60,.10)) border-box; border-radius:var(--radius); }
+    .card:hover, .visual-card:hover, .routine-card:hover { transform:translateY(-4px); box-shadow:0 22px 70px rgba(0,0,0,.38), 0 0 26px rgba(239,35,60,.10); }
+    button, .btn { border-radius:16px; background:linear-gradient(135deg, var(--brand), var(--brand2)); box-shadow:0 10px 28px rgba(239,35,60,.20); }
+    button:hover { filter:brightness(1.08); box-shadow:0 16px 36px rgba(239,35,60,.30); }
+    button.secondary { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); box-shadow:none; }
+    input:focus, select:focus, textarea:focus { border-color:var(--brand); box-shadow:0 0 0 3px rgba(239,35,60,.18); }
+    .progress { height:10px; border-radius:999px; background:rgba(255,255,255,.045); }
+    .progress span { background:linear-gradient(90deg, var(--brand2), var(--brand), #ff6b6b); box-shadow:0 0 18px rgba(239,35,60,.35); }
+    .hero-dashboard { position:relative; overflow:hidden; display:grid; grid-template-columns:1.45fr .8fr; gap:24px; padding:30px; border:1px solid rgba(239,35,60,.26); border-radius:32px; background:radial-gradient(circle at 15% 20%, rgba(239,35,60,.28), transparent 26%), linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.025)); box-shadow:0 30px 100px rgba(0,0,0,.36); }
+    .hero-dashboard::after { content:""; position:absolute; width:260px; height:260px; right:-70px; top:-70px; border-radius:50%; background:repeating-linear-gradient(135deg, rgba(239,35,60,.18) 0 10px, transparent 10px 22px); animation:spinSlow 26s linear infinite; opacity:.55; }
+    @keyframes spinSlow { to { transform:rotate(360deg); } }
+    .hero-copy, .hero-panel { position:relative; z-index:1; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; color:var(--brand); font-size:.78rem; text-transform:uppercase; letter-spacing:.12em; font-weight:800; }
+    .hero-copy h2 { font-family:var(--font-display); font-size:clamp(2.4rem, 5vw, 5rem); line-height:.92; letter-spacing:.02em; text-transform:uppercase; margin:18px 0 12px; color:#fff; max-width:820px; }
+    .hero-copy p { margin:0; color:var(--soft); max-width:680px; }
+    .quick-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+    .quick-actions button svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; }
+    .hero-panel { display:grid; place-items:center; align-content:center; gap:18px; padding:24px; border-radius:28px; background:rgba(0,0,0,.34); border:1px solid rgba(255,255,255,.08); backdrop-filter:blur(14px); text-align:center; }
+    .hero-panel strong { color:#fff; font-family:var(--font-display); letter-spacing:.04em; text-transform:uppercase; font-size:1.35rem; }
+    .progress-ring { --value:0; width:142px; height:142px; border-radius:50%; display:grid; place-items:center; background:conic-gradient(var(--brand) calc(var(--value)*1%), rgba(255,255,255,.08) 0); box-shadow:0 0 34px rgba(239,35,60,.20); }
+    .progress-ring::before { content:""; position:absolute; width:104px; height:104px; border-radius:50%; background:#101012; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06); }
+    .progress-ring span { position:relative; color:#fff; font-family:var(--font-display); font-size:2.2rem; font-weight:800; }
+    .progress-ring span::after { content:"/100"; font-family:var(--font-main); font-size:.72rem; color:var(--muted); margin-left:2px; }
+    .metric-card { min-height:178px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; }
+    .metric-card::after { content:""; position:absolute; right:-26px; top:-30px; width:112px; height:112px; border-radius:50%; background:rgba(239,35,60,.08); filter:blur(2px); }
+    .metric-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .metric-icon { width:42px; height:42px; display:grid; place-items:center; border-radius:16px; background:rgba(239,35,60,.12); color:var(--brand); box-shadow:inset 0 0 0 1px rgba(239,35,60,.18); }
+    .metric-icon svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:2; }
+    .metric-card h3 { margin:0; }
+    .mini-stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px; }
+    .mini-stat { padding:14px; border-radius:18px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); }
+    .mini-stat strong { display:block; color:#fff; font-family:var(--font-display); font-size:1.45rem; }
+    .mini-stat span { color:var(--muted); font-size:.78rem; }
+    .chart-container { padding:14px; border-radius:20px; background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.06); }
+    .empty { background:linear-gradient(135deg, rgba(255,255,255,.035), rgba(239,35,60,.035)); border-style:solid; position:relative; overflow:hidden; }
+    .empty::after { content:""; position:absolute; inset:0; transform:translateX(-100%); background:linear-gradient(90deg, transparent, rgba(255,255,255,.055), transparent); animation:loadingSweep 2.6s ease-in-out infinite; }
+    @keyframes loadingSweep { 60%,100% { transform:translateX(100%); } }
+    .toast-item { min-width:min(360px, calc(100vw - 40px)); border-radius:18px; background:rgba(16,16,18,.9); backdrop-filter:blur(16px); border:1px solid rgba(239,35,60,.24); border-left:0!important; box-shadow:0 18px 60px rgba(0,0,0,.45); }
+    .toast-mark { width:32px; height:32px; border-radius:12px; display:grid; place-items:center; background:rgba(239,35,60,.14); color:var(--brand); font-weight:900; }
+    .toast-copy strong { display:block; color:#fff; line-height:1.15; }
+    .toast-copy span { display:block; color:var(--muted); font-size:.84rem; margin-top:3px; }
+
+
+    /* --- BUTTON CLEANUP: FLAT BUTTONS, NO SHADOWS / NO BORDER LOOK --- */
+    button, .btn,
+    .quick-actions button,
+    .toolbar button,
+    .section-tabs button,
+    .library-tabs button,
+    .auth-tabs button {
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+    }
+    button:hover, .btn:hover,
+    .quick-actions button:hover,
+    .toolbar button:hover,
+    .section-tabs button:hover,
+    .library-tabs button:hover,
+    .auth-tabs button:hover {
+      box-shadow: none !important;
+    }
+    button.secondary, .btn.secondary,
+    .quick-actions button.secondary,
+    .toolbar button.secondary {
+      border: 0 !important;
+      background: rgba(255,255,255,.055) !important;
+      box-shadow: none !important;
+    }
+    .quick-actions button {
+      min-height: 48px;
+      padding-inline: 18px;
+    }
+    .quick-actions button svg {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     @media(max-width: 720px) {
       main { padding: 18px 16px 48px; }
       .topbar { margin: -18px -16px 18px; padding: 14px 16px; align-items:flex-start; flex-direction:column; }
       .calendar { grid-template-columns: 1fr; }
+      .hero-dashboard { grid-template-columns:1fr; padding:22px; border-radius:24px; }
+      .hero-copy h2 { font-size:2.6rem; }
+      .mini-stat-grid { grid-template-columns:1fr; }
       table { min-width: 720px; }
       .routine-head { flex-direction:column; }
     }
@@ -243,6 +355,7 @@
       .card, .wide, .half, .third, .quarter { grid-column: 1 / -1; }
       .form-grid .field, .form-grid .field.half { grid-column: 1 / -1; }
       .calendar { grid-template-columns: repeat(2, 1fr); }
+      .hero-dashboard { grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -277,6 +390,13 @@
     <div class="brand">
       <div class="logo">F</div>
       <div><h1>FITNESS</h1><p>Training OS</p></div>
+    </div>
+    <div class="profile-mini-card">
+      <div class="avatar-ring"><span>KB</span></div>
+      <div>
+        <strong>Keshan</strong>
+        <small><i class="status-dot"></i> Athlete profile active</small>
+      </div>
     </div>
     <div class="nav-search">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -314,8 +434,29 @@
     </div>
 
     <section id="dashboard" class="page active">
-      <div id="aiNotices" class="grid" style="margin-top: 0;"></div>
-      <div class="grid" id="dashboardCards"></div>
+      <div class="hero-dashboard">
+        <div class="hero-copy">
+          <span class="eyebrow"><i class="status-dot"></i> Live Fitness Command Center</span>
+          <h2>Train smarter. Recover faster. Stay consistent.</h2>
+          <p>Your workouts, nutrition, recovery, records, and database tools are still here — redesigned into a fitness-app style first screen.</p>
+          <div class="quick-actions">
+            <button type="button" onclick="switchTab('workoutLogs')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M18 5v14M6 12h12M4 7h4M4 17h4M16 7h4M16 17h4"></path></svg><span>Log Workout</span></button>
+            <button type="button" onclick="switchTab('nutrition')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg><span>Add Meal</span></button>
+            <button type="button" onclick="switchTab('recovery')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg><span>Recovery Check</span></button>
+            <button type="button" class="secondary" onclick="switchTab('library')"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg><span>Open Hub</span></button>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="progress-ring" id="heroReadinessRing" style="--value:0"><span id="heroReadinessValue">0</span></div>
+          <div>
+            <strong>Readiness Score</strong>
+            <p class="small muted">Updates from your recovery logs, sleep, hydration, and daily nutrition activity.</p>
+            <span class="badge danger">Matte Black + Red Mode</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid today-summary-grid" id="dashboardCards"></div>
+      <div id="aiNotices" class="grid intelligence-grid" style="margin-top: 20px;"></div>
       <div class="grid">
         <div class="card wide">
           <h3>Volume Progression (kg)</h3>
@@ -1250,14 +1391,41 @@ async function updateDashboard(){
   const consistency = logs.length ? Math.round(completed/logs.length*100) : 0;
   const activePlan=plans.find(p=>p.IsActive==='true') || plans.at(-1);
 
-  document.getElementById('dashboardCards').innerHTML = [
-    ['Execution Rate', consistency+'%', `${completed} completed · ${missed} missed`, consistency],
-    ['Current Protocol', activePlan?.SplitName || 'N/A', activePlan?.PatternType || 'Awaiting assignment', 100],
-    ['Adherence Streak', calculateSplitBasedStreak(logs)+' Days', 'Algorithmically validated', 100],
-    ['Load Volume', Math.round(volume).toLocaleString()+' kg', `${sets} sets · ${reps} reps`, Math.min(100,volume/10000*100)],
-    ['Protein Synthesis', Math.round(protein)+'g', `${Math.round(calories)} kcal input`, Math.min(100,protein/160*100)],
-    ['System Readiness', Math.round(avgRecovery||0)+'/100', `${avgSleep.toFixed(1)||0}h Sleep · ${water}ml H2O`, avgRecovery||0]
-  ].map(c=>`<div class="card third"><h3>${c[0]}</h3><div class="big">${c[1]}</div><p class="muted small">${c[2]}</p><div class="progress"><span style="width:${Math.min(100,c[3])}%"></span></div></div>`).join('');
+  const readinessScore = Math.round(avgRecovery || 0);
+  const streakDays = calculateSplitBasedStreak(logs);
+  const caloriePct = Math.min(100, calories / 2500 * 100);
+  const proteinPct = Math.min(100, protein / 160 * 100);
+  const waterPct = Math.min(100, water / 3000 * 100);
+  const heroRing = document.getElementById('heroReadinessRing');
+  const heroValue = document.getElementById('heroReadinessValue');
+  if (heroRing) heroRing.style.setProperty('--value', readinessScore);
+  if (heroValue) heroValue.textContent = readinessScore;
+
+  document.getElementById('dashboardCards').innerHTML = `
+    <div class="card full metric-card">
+      <div class="metric-head">
+        <div>
+          <span class="eyebrow"><i class="status-dot"></i> Today's Summary</span>
+          <h3 style="font-size:1.05rem; color:#fff; margin-top:10px;">Daily performance snapshot</h3>
+          <p class="muted small" style="margin:0;">Nutrition, hydration, training consistency, and active protocol are grouped here so the first screen feels less like an admin panel.</p>
+        </div>
+        <span class="badge ${consistency >= 75 ? 'success' : consistency >= 45 ? 'warning' : 'danger'}">${consistency}% consistent</span>
+      </div>
+      <div class="mini-stat-grid">
+        <div class="mini-stat"><strong>${Math.round(calories)}</strong><span>Calories today</span></div>
+        <div class="mini-stat"><strong>${Math.round(protein)}g</strong><span>Protein today</span></div>
+        <div class="mini-stat"><strong>${water}ml</strong><span>Water today</span></div>
+      </div>
+    </div>
+    ${[
+      ['Execution Rate', consistency+'%', `${completed} completed · ${missed} missed · ${moved} moved`, consistency, icons.chart, consistency >= 75 ? 'success' : 'warning'],
+      ['Current Protocol', activePlan?.SplitName || 'No protocol', activePlan?.PatternType || 'Awaiting assignment', 100, icons.plan, 'info'],
+      ['Workout Streak', streakDays+' Days', 'Split-based streak tracking', Math.min(100, streakDays * 10), icons.trophy, streakDays > 0 ? 'success' : 'warning'],
+      ['Load Volume', Math.round(volume).toLocaleString()+' kg', `${sets} sets · ${reps} reps`, Math.min(100,volume/10000*100), icons.weight, 'danger'],
+      ['Nutrition Targets', Math.round(protein)+'g protein', `${Math.round(calories)} kcal · ${Math.round(proteinPct)}% protein target`, proteinPct, icons.food, proteinPct >= 75 ? 'success' : 'warning'],
+      ['Recovery Score', readinessScore+'/100', `${(avgSleep||0).toFixed(1)}h sleep · ${water}ml H2O`, readinessScore, icons.sleep, readinessScore >= 70 ? 'success' : readinessScore >= 45 ? 'warning' : 'danger']
+    ].map(c=>`<div class="card third metric-card"><div class="metric-head"><h3>${c[0]}</h3><span class="metric-icon">${c[4]}</span></div><div><div class="big">${c[1]}</div><p class="muted small">${c[2]}</p><span class="badge ${c[5]}">${c[5].toUpperCase()}</span></div><div class="progress"><span style="width:${Math.min(100,c[3])}%"></span></div></div>`).join('')}
+  `;
 
   document.getElementById('caloriesToday').textContent=Math.round(calories);
   document.getElementById('proteinToday').textContent=Math.round(protein)+'g';
@@ -1338,10 +1506,10 @@ function chart(id,type,data,options={}){
 function renderCharts(exs,logs,prs,body){
   const volByDate={}; exs.forEach(e=>volByDate[e.Date]=(volByDate[e.Date]||0)+Number(e.Volume||0));
   const labels=Object.keys(volByDate).slice(-10), values=labels.map(l=>volByDate[l]);
-  chart('volumeChart','line',{labels,datasets:[{label:'Volume (kg)',data:values,borderColor:'#3b82f6',backgroundColor:'rgba(59, 130, 246, 0.1)',fill:true,tension:0.4}]});
+  chart('volumeChart','line',{labels,datasets:[{label:'Volume (kg)',data:values,borderColor:'#ef233c',backgroundColor:'rgba(239, 35, 60, 0.14)',fill:true,tension:0.4}]});
   
   const muscles={}; exs.forEach(e=>muscles[e.MuscleGroup||'Other']=(muscles[e.MuscleGroup||'Other']||0)+Number(e.Sets||0));
-  chart('muscleChart','doughnut',{labels:Object.keys(muscles),datasets:[{data:Object.values(muscles),backgroundColor:['#8B5CF6','#3B82F6','#10B981','#F59E0B','#EF4444','#EC4899'], borderWidth:0}]},{cutout:'70%'});
+  chart('muscleChart','doughnut',{labels:Object.keys(muscles),datasets:[{data:Object.values(muscles),backgroundColor:['#ef233c','#9f1239','#22c55e','#f59e0b','#f43f5e','#7f1d1d'], borderWidth:0}]},{cutout:'70%'});
   
   renderPRDashboard(prs);
   chart('bodyChart','line',{labels:body.map(b=>b.Date).slice(-10),datasets:[{label:'Mass',data:body.map(b=>b.Weight).slice(-10),borderColor:'#F59E0B',tension:0.4}]});
@@ -1369,7 +1537,7 @@ function runActionableIntelligence(data={}){
   if(under) notices.push([`Underutilized Vector: ${under}`,'Weekly set volume is beneath maintenance threshold.','Atrophy.','Integrate 3-5 working sets into next protocol.','info']);
   if(!notices.length) notices.push(['System Optimal','All telemetry within acceptable parameters.','Sustained progression.','Maintain current output trajectory.','success']);
 
-  document.getElementById('aiNotices').innerHTML=notices.map(n=>`<div class="card third"><span class="badge ${n[4]}">${n[4].toUpperCase()}</span><h3 style="margin:16px 0 8px; color:#fff;">${n[0]}</h3><p class="small muted" style="margin:6px 0; line-height:1.6;"><strong>Root:</strong> ${n[1]}</p><p class="small muted" style="margin:6px 0; line-height:1.6;"><strong>Risk:</strong> ${n[2]}</p><p class="small" style="margin:12px 0 0; color:var(--brand); line-height:1.6;"><strong>Directive:</strong> ${n[3]}</p></div>`).join('');
+  document.getElementById('aiNotices').innerHTML=notices.map(n=>`<div class="card third metric-card"><div class="metric-head"><span class="badge ${n[4]}">${n[4].toUpperCase()}</span><span class="metric-icon">${icons.brain}</span></div><h3 style="margin:16px 0 8px; color:#fff;">${n[0]}</h3><p class="small muted" style="margin:6px 0; line-height:1.6;"><strong>Root:</strong> ${n[1]}</p><p class="small muted" style="margin:6px 0; line-height:1.6;"><strong>Risk:</strong> ${n[2]}</p><p class="small" style="margin:12px 0 0; color:var(--brand); line-height:1.6;"><strong>Directive:</strong> ${n[3]}</p></div>`).join('');
   document.getElementById('intelligenceNotices').innerHTML=notices.map(n=>`<div class="notice"><strong style="margin-bottom:8px;">${n[0]}</strong><div class="small muted" style="line-height:1.8;"><span style="color:var(--danger)">Risk:</span> ${n[2]} <br> <span style="color:var(--brand)">Directive:</span> ${n[3]}</div></div>`).join('');
   
   const trend=exs.slice(-10).reduce((s,e)=>s+Number(e.Volume||0),0), prior=exs.slice(-20,-10).reduce((s,e)=>s+Number(e.Volume||0),0);
@@ -1392,9 +1560,12 @@ async function renderMonthlyReport(){
 function filterByMonth(){document.getElementById('customMonth').style.display=document.getElementById('globalFilter').value==='custom'?'block':'none';updateDashboard()}
 
 function toast(msg,type='success'){
-  const el=document.createElement('div'); el.className='toast-item'; 
-  el.style.borderLeftColor = type === 'danger' ? 'var(--danger)' : type === 'warning' ? 'var(--warn)' : 'var(--brand)';
-  el.innerHTML=`<span style="color:${type === 'danger' ? 'var(--danger)' : 'var(--brand)'}">SYS//</span> ${msg}`;
+  const el=document.createElement('div');
+  el.className='toast-item';
+  const title = type === 'danger' ? 'Action needed' : type === 'warning' ? 'Check this' : 'Update saved';
+  const mark = type === 'danger' ? '!' : type === 'warning' ? '?' : '✓';
+  el.style.borderColor = type === 'danger' ? 'rgba(239,68,68,.42)' : type === 'warning' ? 'rgba(245,158,11,.42)' : 'rgba(239,35,60,.32)';
+  el.innerHTML=`<span class="toast-mark">${mark}</span><span class="toast-copy"><strong>${title}</strong><span>${escapeHtml(msg)}</span></span>`;
   document.getElementById('toastContainer').appendChild(el);
   setTimeout(()=>el.remove(),3600);
 }
