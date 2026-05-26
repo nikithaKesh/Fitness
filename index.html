@@ -507,6 +507,19 @@
       main { padding-top:76px; }
     }
 
+
+    /* --- MISSING FEATURE POLISH: BMI STATUS + CALCULATOR FORMULA GUIDE --- */
+    .bmi-status-indicator {
+      display:inline-flex; align-items:center; gap:8px; margin-top:8px; padding:8px 12px;
+      border-radius:999px; font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em;
+      background:rgba(255,255,255,.045); border:1px solid var(--border); color:var(--muted);
+    }
+    .bmi-status-indicator.normal { color:var(--accent); border-color:rgba(34,197,94,.35); background:rgba(34,197,94,.09); }
+    .bmi-status-indicator.underweight, .bmi-status-indicator.overweight { color:var(--warn); border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.09); }
+    .bmi-status-indicator.obesity { color:var(--danger); border-color:rgba(239,68,68,.35); background:rgba(239,68,68,.09); }
+    .formula-note { margin-top:14px; padding:14px; border-radius:16px; border:1px solid var(--border); background:rgba(255,255,255,.035); line-height:1.7; }
+    .body-heatmap-note { text-align:center; color:var(--muted); font-size:.78rem; margin-top:10px; }
+
   </style>
 </head>
 <body class="auth-locked">
@@ -684,7 +697,7 @@
           </form>
         </div>
         <div class="card third">
-          <div style="margin-bottom: 24px;"><h3>BMI</h3><div class="big" id="bmiPreview" style="color:var(--brand)">0.0</div></div>
+          <div style="margin-bottom: 24px;"><h3>BMI</h3><div class="big" id="bmiPreview" style="color:var(--brand)">0.0</div><div id="bmiStatusPreview" class="bmi-status-indicator">Awaiting body data</div></div>
           <div style="margin-bottom: 24px;"><h3>Target TDEE</h3><div class="big" id="tdeePreview" style="color:var(--warn)">0</div><p class="small muted">Mifflin-St Jeor Formula applied.</p></div>
           <div><h3>Protein Target</h3><div class="big" id="proteinPreview" style="color:var(--accent)">0g</div></div>
         </div>
@@ -898,7 +911,7 @@
         <div class="card half">
           <h3>Computed Outputs</h3>
           <div id="nutritionResults" class="calc-output-grid"><div class="empty full">Enter biometric data to calculate.</div></div>
-          <p class="small muted" style="margin-top:14px; line-height:1.7;">These calculators use standard fitness equations such as BMI categories, Mifflin-St Jeor BMR/TDEE, U.S. Navy body fat, Hamwi/Devine-style ideal weight ranges, Epley 1RM, MET calories, and macro split logic. No log is saved from this page.</p>
+          <p class="small muted" style="margin-top:14px; line-height:1.7;">These calculators use standard fitness equations such as BMI categories, Mifflin-St Jeor BMR/TDEE, U.S. Navy body fat, Devine-style ideal weight ranges, Epley 1RM, MET calories, and macro split logic. No log is saved from this page.</p><div class="formula-note small muted"><strong>Calculator logic:</strong> BMI shows healthiness status, BMR/TDEE use activity multipliers, macros split calories into protein/carbs/fats, body fat uses waist/neck/hip inputs, and calories burned uses MET × body weight × time.</div>
         </div>
       </div>
     </section>
@@ -1353,7 +1366,13 @@ function calculateProteinTarget(weight, goal){let multi = goal?.includes('Fat lo
 function updateCalculatorPreview(){
   const w=Number(document.getElementById('weightInput')?.value||0), h=Number(document.getElementById('heightInput')?.value||0), age=calculateAge(), goal=document.getElementById('goalInput')?.value, act=document.getElementById('activityInput')?.value;
   const bmi=calculateBMI(w,h), bmr=calculateBMR(w,h,age,document.querySelector('[name="Gender"]')?.value||'Male'), tdee=calculateTDEE(bmr,act), protein=calculateProteinTarget(w,goal);
-  document.getElementById('bmiPreview').textContent=bmi?bmi.toFixed(1):'0.0';
+  const bmiBox=document.getElementById('bmiPreview'), statusBox=document.getElementById('bmiStatusPreview');
+  if(bmiBox) bmiBox.textContent=bmi?bmi.toFixed(1):'0.0';
+  if(statusBox){
+    const status=bmi?bmiCategory(bmi):'Awaiting body data';
+    statusBox.textContent=status;
+    statusBox.className='bmi-status-indicator '+(status.includes('Normal')?'normal':status.includes('Underweight')?'underweight':status.includes('Overweight')?'overweight':status.includes('Obesity')?'obesity':'');
+  }
   document.getElementById('tdeePreview').textContent=tdee?Math.round(tdee):'0';
   document.getElementById('proteinPreview').textContent=protein+'g';
 }
@@ -2207,7 +2226,7 @@ function renderAdvancedCalculator(){
 function activityFactor(v){return ({Sedentary:1.2,Light:1.375,Moderate:1.55,Active:1.725,'Very active':1.9}[v]||1.55);}
 function bmiCategory(bmi){return bmi<18.5?'Underweight':bmi<25?'Normal':bmi<30?'Overweight':bmi<35?'Obesity Class I':bmi<40?'Obesity Class II':'Obesity Class III';}
 function calcBmr(w,h,a,g){return g==='Male'?10*w+6.25*h-5*a+5:10*w+6.25*h-5*a-161;}
-function bodyFatNavy(w,h,waist,neck,hip,g){if(!h||!waist||!neck) return 0; return g==='Male'?495/(1.0324-0.19077*Math.log10(waist-neck)+0.15456*Math.log10(h))-450:495/(1.29579-0.35004*Math.log10(waist+hip-neck)+0.22100*Math.log10(h))-450;}
+function bodyFatNavy(w,h,waist,neck,hip,g){if(!h||!waist||!neck) return 0; if(g==='Male' && waist<=neck) return 0; if(g==='Female' && (!hip || waist+hip<=neck)) return 0; const val=g==='Male'?495/(1.0324-0.19077*Math.log10(waist-neck)+0.15456*Math.log10(h))-450:495/(1.29579-0.35004*Math.log10(waist+hip-neck)+0.22100*Math.log10(h))-450; return Number.isFinite(val)?Math.max(0,Math.min(75,val)):0;}
 function idealWeightRange(h,g){const inches=h/2.54, over=Math.max(0,inches-60); const base=g==='Male'?50:45.5; const devine=base+2.3*over; return [devine*0.9,devine*1.1];}
 function renderCalcCards(items=[]){const box=document.getElementById('nutritionResults'); if(!box)return; box.innerHTML=items.map(i=>`<div class="calc-output-card"><span class="small muted">${escapeHtml(i[0])}</span><strong>${escapeHtml(i[1])}</strong>${i[2]?`<div class="small muted">${escapeHtml(i[2])}</div>`:''}</div>`).join('');}
 function advancedFitnessCalculate(){
@@ -2233,7 +2252,7 @@ function advancedFitnessCalculate(){
     'Protein Calculator':[['Protein',Math.round(protein)+' g','General training target']],
     'Fat Intake Calculator':[['Fat intake',Math.round(fat)+' g','~25% of target calories']],
     'TDEE Calculator':[['TDEE',Math.round(tdee)+' kcal',activity],['Goal calories',Math.round(target)+' kcal',goal]],
-    'Body Type Calculator':[['Body type guide',bmi?(bmi<20?'Lean / ectomorph-lean':bmi<27?'Balanced / mesomorph range':'Higher-fat / endomorph range'):'—','Estimate based on BMI + measurements']]
+    'Body Type Calculator':[['Body type guide',bmi?(bmi<20?'Lean / ectomorph-lean':bmi<27?'Balanced / mesomorph range':'Higher-fat / endomorph range'):'—','Estimate based on BMI + waist/neck/hip measurements'],['Waist-to-height',h&&waist?(waist/h).toFixed(2):'—','Lower is generally better for health'],['Body fat signal',bf?bf.toFixed(1)+'%':'—','Uses U.S. Navy inputs when available']]
   };
   renderCalcCards(base[type]||base['BMI Calculator']);
 }
@@ -2255,7 +2274,7 @@ function renderMuscleHeatmap(exs=[]){
     <path class="muscle-group" d="M108 222 Q92 272 86 352 Q86 386 106 386 Q120 382 121 352 L128 236 Z" fill="${color('Legs')}"><title>${label('Legs')}</title></path>
     <path class="muscle-group" d="M152 222 Q168 272 174 352 Q174 386 154 386 Q140 382 139 352 L132 236 Z" fill="${color('Legs')}"><title>${label('Legs')}</title></path>
     <path class="muscle-group" d="M98 78 Q130 104 162 78" fill="none" stroke="${color('Back')}" stroke-width="12" stroke-linecap="round"><title>${label('Back')}</title></path>
-  </svg><div class="heatmap-list">${muscles.map(m=>`<div><span>${m}</span><strong style="color:${color(m)}">${counts[m]||0} sets</strong></div>`).join('')}<p class="small muted">Inspired by human-body muscle map interfaces. Uses logged sets to create training heat intensity.</p></div></div>`;
+  </svg><div class="heatmap-list">${muscles.map(m=>`<div><span>${m}</span><strong style="color:${color(m)}">${counts[m]||0} sets</strong></div>`).join('')}<p class="small muted">Human-body heatmap inspired by MuscleWiki-style maps and body-muscles SVG intensity logic. Uses logged sets to create training heat intensity.</p></div></div>`;
 }
 
 const originalUpdateDashboard = updateDashboard;
