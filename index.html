@@ -1602,6 +1602,14 @@ function unlockApp(user){
   updateDashboard();
 }
 
+function explainAuthError(message=''){
+  const msg = String(message || 'Authentication failed.');
+  if(/not active|inactive|disabled|deactivated/i.test(msg)){
+    return 'This account exists, but it is marked inactive in the Users sheet. Set its Status / AccountStatus / IsActive value to Active or TRUE, then login again.';
+  }
+  return msg;
+}
+
 async function handleLogin(e){
   e.preventDefault();
   const data = formData(e.target);
@@ -1610,19 +1618,30 @@ async function handleLogin(e){
     unlockApp(json.user || json.data || {});
     toast('Login successful');
   } catch(err) {
-    toast(err.message, 'danger');
+    toast(explainAuthError(err.message), 'danger');
   }
 }
 
 async function handleRegister(e){
   e.preventDefault();
   const data = formData(e.target);
+
+  // Newly created accounts must be immediately active for this personal tracker.
+  // Different Apps Script versions may check different column names, so we send all common status fields.
+  const registerPayload = {
+    ...data,
+    Status: 'Active',
+    AccountStatus: 'Active',
+    IsActive: 'TRUE',
+    Active: 'TRUE'
+  };
+
   try {
-    const json = await authApi('register', data);
-    unlockApp(json.user || json.data || {});
+    const json = await authApi('register', registerPayload);
+    unlockApp(json.user || json.data || registerPayload || {});
     toast('Account created and logged in');
   } catch(err) {
-    toast(err.message, 'danger');
+    toast(explainAuthError(err.message), 'danger');
   }
 }
 
