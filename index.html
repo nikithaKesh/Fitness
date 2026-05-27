@@ -520,6 +520,141 @@
     .formula-note { margin-top:14px; padding:14px; border-radius:16px; border:1px solid var(--border); background:rgba(255,255,255,.035); line-height:1.7; }
     .body-heatmap-note { text-align:center; color:var(--muted); font-size:.78rem; margin-top:10px; }
 
+
+
+    /* --- FINAL PERSONAL FITNESS UX CONSOLIDATION --- */
+    :root{
+      --bg:#070707;--bg2:#0d0d0f;--panel:#121214;--panel-2:#17171a;--panel-hover:#201114;
+      --border:rgba(239,35,60,.16);--border-soft:rgba(255,255,255,.07);--text:#f8fafc;--muted:#a1a1aa;--soft:#d4d4d8;
+      --brand:#ef233c;--brand2:#9f1239;--brand-soft:rgba(239,35,60,.11);--brand-glow:rgba(239,35,60,.32);
+      --accent:#22c55e;--warn:#f59e0b;--danger:#ef4444;--radius:22px;--radius2:15px;
+      --shadow:none;
+    }
+    body{background:radial-gradient(circle at 14% 6%,rgba(239,35,60,.12),transparent 26%),linear-gradient(180deg,#09090a 0%,#060606 100%);}
+    body[data-theme="light"]{--bg:#fff7f8;--bg2:#fff1f3;--panel:#ffffff;--panel-2:#fff8f9;--panel-hover:rgba(239,35,60,.075);--border:rgba(159,18,57,.16);--border-soft:rgba(23,23,23,.08);--text:#171717;--muted:rgba(23,23,23,.62);--soft:rgba(23,23,23,.82);--brand-soft:rgba(239,35,60,.08);}
+    aside{border-right:1px solid var(--border);background:linear-gradient(180deg,var(--bg2),rgba(13,13,15,.92));}
+    body[data-theme="light"] aside{background:linear-gradient(180deg,var(--bg2),rgba(255,241,243,.92));}
+    .topbar{display:none!important}.topbar-actions-hidden{display:none!important}main{padding-top:32px;}
+    .brand{margin-bottom:20px}.brand p{color:var(--muted)}
+    .profile-mini-card{margin:0 0 18px;background:linear-gradient(135deg,var(--brand-soft),rgba(255,255,255,.025));border-color:var(--border);box-shadow:none;}
+    .nav-section{margin:18px 0 8px}.nav-item{min-height:48px;border-radius:16px;margin:5px 0;color:var(--soft)}
+    .nav-item:hover{background:var(--panel-hover);border-color:var(--border)}
+    .nav-item.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:none}.nav-item.active svg{stroke:#fff}
+    .sub-nav-wrap{position:sticky;top:0;z-index:12;background:linear-gradient(180deg,var(--bg),rgba(7,7,7,.72));backdrop-filter:blur(14px);padding:8px 0 14px;margin:-8px auto 20px;}
+    body[data-theme="light"] .sub-nav-wrap{background:linear-gradient(180deg,var(--bg),rgba(255,247,248,.72));}
+    .sub-nav-wrap button{min-height:40px;background:rgba(255,255,255,.045);color:var(--soft);box-shadow:none!important;border:0!important;}
+    .sub-nav-wrap button.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;}
+    .card,.visual-card,.routine-card,.notice,.empty,.day,.modal-box,.auth-card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--border-soft);box-shadow:none;}
+    .card:hover,.visual-card:hover,.routine-card:hover{transform:translateY(-2px);border-color:rgba(239,35,60,.26);box-shadow:none;}
+    .hero-dashboard{background:linear-gradient(135deg,rgba(239,35,60,.18),rgba(255,255,255,.035)),var(--panel);border-color:rgba(239,35,60,.22);box-shadow:none;}
+    .hero-dashboard::after{opacity:.18}.eyebrow{color:var(--brand)}.hero-copy h2{font-size:clamp(2.15rem,4.5vw,4.6rem)}
+    button,.btn{box-shadow:none!important;border:0!important;background:linear-gradient(135deg,var(--brand),var(--brand2));}
+    button.secondary,.btn.secondary{background:rgba(255,255,255,.055)!important;color:var(--soft);}
+    input,select,textarea{background:rgba(255,255,255,.035);border-color:var(--border-soft);color:var(--text)}
+    td{background:rgba(255,255,255,.032);border-color:var(--border-soft)}th{color:var(--muted)}
+    .metric-card{min-height:154px}.today-summary-grid .full.metric-card{min-height:auto}.mini-stat-grid{grid-template-columns:repeat(3,minmax(120px,1fr));}
+    .page-filter-bar{display:none!important}.settings-grid{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:14px;margin-top:16px;}
+    .settings-tile{border:1px solid var(--border-soft);border-radius:20px;background:rgba(255,255,255,.035);padding:18px;display:grid;gap:10px;align-content:start;}
+    .settings-tile strong{color:#fff}.settings-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:15px;background:var(--brand-soft);color:var(--brand);font-weight:900}.danger-zone{border-color:rgba(239,68,68,.24)}
+    .nutrition-auto-preview{grid-template-columns:repeat(4,minmax(110px,1fr));}.nutrition-chip,.profile-info-item,.calc-output-card,.micro-stat{background:rgba(255,255,255,.04);border-color:var(--border-soft)}
+    .profile-view-card.active{display:grid}.profile-info-grid{grid-template-columns:repeat(4,minmax(140px,1fr));}.bmi-status-indicator{font-size:.72rem}
+    .schedule-entry-layout{grid-template-columns:minmax(260px,1fr) minmax(360px,.86fr)}.set-side-panel{background:rgba(255,255,255,.032);}
+    .schedule-set-row input[name="TargetLoad"],.schedule-set-row [name="TargetLoad"]{display:none!important}
+    .mobile-menu-toggle{box-shadow:none!important;background:linear-gradient(135deg,var(--brand),var(--brand2))!important;}
+    .sidebar-scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:19}.sidebar-open .sidebar-scrim{display:block}
+    @media(max-width:1080px){aside{left:-306px}.sidebar-open aside{left:0}main{padding-top:76px}.sub-nav-wrap{top:0;margin-top:-76px;padding-top:76px}.settings-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:720px){main{padding-left:14px;padding-right:14px}.hero-dashboard{padding:20px}.quick-actions{display:grid;grid-template-columns:1fr 1fr}.quick-actions button{width:100%}.mini-stat-grid,.profile-info-grid,.settings-grid,.nutrition-auto-preview{grid-template-columns:1fr}.card{padding:18px}.schedule-entry-layout{grid-template-columns:1fr}.set-side-panel .schedule-set-row{grid-template-columns:1fr 1fr!important}.table-wrap{overflow-x:auto}table{min-width:680px}.mobile-card-table table{min-width:0}.mobile-card-table thead{display:none}.mobile-card-table tr{display:block;background:rgba(255,255,255,.035);border:1px solid var(--border-soft);border-radius:16px;margin:10px 0;padding:10px}.mobile-card-table td{display:flex;justify-content:space-between;gap:12px;border:0!important;background:transparent!important;padding:8px!important}.mobile-card-table td::before{content:attr(data-label);color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em}.mobile-card-table td:first-child,.mobile-card-table td:last-child{border-radius:0}.toast-container{left:14px;right:14px}.toast-item{min-width:0;width:100%}}
+
+
+
+    /* --- FIX: FULL SIDEBAR NAVIGATION BUTTONS --- */
+    #navList { display:grid; gap:4px; }
+    #navList .nav-section { padding-left:6px; }
+    #navList .nav-item { width:100%; }
+    @media(max-width:1080px){
+      .sidebar-open .mobile-menu-toggle{right:calc(100vw - 264px);}
+    }
+
+
+    /* --- SIDEBAR SECTION STYLE: SYSTEM / TRAINING / NUTRITION / DATABASE ONLY --- */
+    #navList{
+      display:grid !important;
+      gap:12px !important;
+      margin-top:18px;
+    }
+    #navList .nav-section{
+      display:none !important;
+    }
+    #navList .nav-item{
+      width:100%;
+      min-height:58px;
+      justify-content:flex-start;
+      gap:16px;
+      padding:0 22px;
+      border-radius:0 22px 22px 0;
+      background:transparent;
+      color:var(--soft);
+      font-family:var(--font-display);
+      font-size:1.02rem;
+      font-weight:800;
+      letter-spacing:.045em;
+      text-transform:uppercase;
+      border:0 !important;
+      box-shadow:none !important;
+      position:relative;
+    }
+    #navList .nav-item svg{
+      width:18px;
+      height:18px;
+      opacity:.78;
+      stroke-width:2;
+      flex:0 0 auto;
+    }
+    #navList .nav-item:hover{
+      background:rgba(255,255,255,.045);
+      color:#fff;
+    }
+    #navList .nav-item.active{
+      background:linear-gradient(90deg, rgba(239,35,60,.28), rgba(255,255,255,.045));
+      color:#fff;
+      border-radius:0 24px 24px 0;
+      padding-left:22px;
+      box-shadow:none !important;
+    }
+    #navList .nav-item.active::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:12px;
+      bottom:12px;
+      width:5px;
+      border-radius:0 999px 999px 0;
+      background:var(--brand);
+      box-shadow:0 0 18px var(--brand-glow);
+    }
+    #navList .nav-item.active svg{
+      color:var(--brand);
+      stroke:var(--brand);
+      opacity:1;
+    }
+    #navList .nav-item span{
+      line-height:1;
+      padding-top:1px;
+    }
+    .nav-search{
+      margin-bottom:28px;
+    }
+    .nav-search input{
+      height:52px;
+      border-radius:10px;
+      background:#050505;
+      border:1px solid rgba(239,35,60,.18);
+      color:var(--text);
+    }
+    body[data-theme="light"] .nav-search input{
+      background:rgba(255,255,255,.65);
+    }
+
   </style>
 </head>
 <body class="auth-locked">
@@ -552,7 +687,7 @@
   <aside>
     <div class="brand">
       <div class="logo">F</div>
-      <div><h1>FITNESS</h1><p>Training OS</p></div>
+      <div><h1>FITNESS</h1><p>Personal Tracker</p></div>
     </div>
     <div class="profile-mini-card">
       <div class="avatar-ring"><span>KB</span></div>
@@ -604,9 +739,9 @@
     <section id="dashboard" class="page active">
       <div class="hero-dashboard">
         <div class="hero-copy">
-          <span class="eyebrow"><i class="status-dot"></i> Live Fitness Command Center</span>
+          <span class="eyebrow"><i class="status-dot"></i> Private Fitness Dashboard</span>
           <h2>Train smarter. Recover faster. Stay consistent.</h2>
-          <p>Your workouts, nutrition, recovery, records, and database tools are still here — redesigned into a fitness-app style first screen.</p>
+          <p>A cleaner daily view for today’s workout, meals, readiness, streak, progress, and quick logging.</p>
           <div class="quick-actions">
             <button type="button" onclick="switchTab('workoutLogs')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M18 5v14M6 12h12M4 7h4M4 17h4M16 7h4M16 17h4"></path></svg><span>Log Workout</span></button>
             <button type="button" onclick="switchTab('nutrition')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg><span>Add Meal</span></button>
@@ -759,7 +894,7 @@
               <div class="field"><label>End Date</label><input type="date" name="EndDate"></div>
               <div class="field full"><label>Schedule Notes</label><input name="Notes" placeholder="Why you used this schedule, what changed, injuries, focus areas..."></div>
             </div>
-            <div class="import-zone" style="margin-top:22px;"><label>Import Exercises by Excel Sheet</label><input type="file" accept=".xlsx,.xls,.csv" onchange="importScheduleExcel(event)"><p class="small muted" style="margin:8px 0 0;">Columns supported: ExerciseName, MuscleGroup, Equipment, Sets, Reps, TargetLoad, RestSec, Tempo, Notes.</p></div><h3 style="margin-top: 28px; border-top: 1px solid var(--border); padding-top: 22px;">Exercises inside this schedule</h3>
+            <div class="import-zone" style="margin-top:22px;"><label>Import Exercises by Excel Sheet</label><input type="file" accept=".xlsx,.xls,.csv" onchange="importScheduleExcel(event)"><p class="small muted" style="margin:8px 0 0;">Columns supported: ExerciseName, MuscleGroup, Equipment, Sets, Reps, RestSec, Tempo, Notes. Load is ignored in the set-by-set plan.</p></div><h3 style="margin-top: 28px; border-top: 1px solid var(--border); padding-top: 22px;">Exercises inside this schedule</h3>
             <div id="scheduleExerciseRows"></div>
             <div class="toolbar" style="margin-top:16px;">
               <button type="button" class="secondary" onclick="addScheduleExerciseRow()">Add Exercise</button>
@@ -992,6 +1127,48 @@
 
 
 
+
+
+    <section id="settings" class="page">
+      <div class="grid">
+        <div class="card full">
+          <div class="statline">
+            <div>
+              <h3>Personal Settings</h3>
+              <p class="muted small" style="margin:0;">Simple controls for this private fitness tracker.</p>
+            </div>
+            <span class="badge success">Personal Mode</span>
+          </div>
+          <div class="settings-grid">
+            <div class="settings-tile">
+              <span class="settings-icon">✦</span>
+              <strong>Appearance</strong>
+              <p class="small muted">Switch between the main dark fitness theme and the optional light mode.</p>
+              <button type="button" class="secondary" onclick="toggleThemeMode()">Toggle dark / light mode</button>
+            </div>
+            <div class="settings-tile">
+              <span class="settings-icon">⇄</span>
+              <strong>Sync Status</strong>
+              <p class="small muted">Refresh dashboard data from your connected Google Sheets backend.</p>
+              <button type="button" onclick="updateDashboard(); toast('Syncing with Google Sheets')">Sync now</button>
+            </div>
+            <div class="settings-tile">
+              <span class="settings-icon">↥</span>
+              <strong>Export / Import</strong>
+              <p class="small muted">Use the existing spreadsheet and import flows to manage saved training data.</p>
+              <button type="button" class="secondary" onclick="switchTab('schedules')">Open schedule import</button>
+            </div>
+            <div class="settings-tile danger-zone">
+              <span class="settings-icon">⏻</span>
+              <strong>Account</strong>
+              <p class="small muted">Logout only when you are finished using your private tracker.</p>
+              <button type="button" onclick="logout()">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -1093,6 +1270,7 @@ Object.assign(icons, {
 const navItems = [
   ['System','dashboard',icons.target,'Overview'],
   ['System','profile',icons.user,'My Profile'],
+  ['System','settings',`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8.92 4a1.65 1.65 0 0 0 1-1.51V2a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15 3.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.46.5.82.96.96H21a2 2 0 1 1 0 4h-.09c-.46.14-.82.5-.96 1.04Z"></path></svg>`,'Settings'],
   ['Training','planner',icons.flame,'Challenge Starter'],
   ['Training','schedules',icons.clipboard,'Workout Schedules'],
   ['Training','calendar',icons.cal,'Calendar'],
@@ -1105,10 +1283,10 @@ const navItems = [
 ];
 
 const navGroups = [
-  ['System','dashboard',icons.target],
+  ['System','dashboard',icons.dash],
   ['Training','planner',icons.dumbbell],
-  ['Nutrition','nutrition',icons.apple],
-  ['Database','library',icons.server]
+  ['Nutrition','nutrition',icons.food],
+  ['Database','library',icons.db]
 ];
 
 /* =========================
@@ -1215,6 +1393,7 @@ function unlockApp(user){
   localStorage.setItem('FITNESS_USER_NAME', user.FullName || user.Username || 'User');
   document.body.classList.remove('auth-locked');
   document.body.classList.add('auth-unlocked');
+  renderNav();
   updateDashboard();
 }
 
@@ -1256,6 +1435,7 @@ function initAuth(){
     USER_ID = saved;
     document.body.classList.remove('auth-locked');
     document.body.classList.add('auth-unlocked');
+    renderNav();
   }
 }
 
@@ -1306,11 +1486,37 @@ function uid(prefix){return prefix + '_' + Date.now().toString(36) + Math.random
 function renderNav(filter=''){
   const nav = document.getElementById('navList');
   if(!nav) return;
+  const q = String(filter || '').toLowerCase().trim();
+  const activePage = document.querySelector('.page.active')?.id || 'dashboard';
+  const activeItem = navItems.find(i => i[1] === activePage) || navItems[0];
+  const activeGroup = activeItem ? activeItem[0] : 'System';
+
   nav.innerHTML = '';
-  navGroups.filter(g=>g[0].toLowerCase().includes(filter.toLowerCase()) || navItems.some(i=>i[0]===g[0] && i[3].toLowerCase().includes(filter.toLowerCase()))).forEach(group=>{
-    nav.insertAdjacentHTML('beforeend',`<button class="nav-item ${group[1]==='dashboard'?'active':''}" data-main="${group[0]}" data-tab="${group[1]}" onclick="switchMainTheme('${group[0]}')">${group[2]} <span>${group[0]}</span></button>`);
+
+  // Sidebar must show ONLY main themes. Sub themes are rendered in the page sub navigation bar.
+  const visibleGroups = navGroups.filter(group => {
+    const groupName = group[0];
+    if(!q) return true;
+    const children = navItems.filter(item => item[0] === groupName);
+    return groupName.toLowerCase().includes(q) || children.some(item => item[3].toLowerCase().includes(q));
   });
-  renderSubNav('System');
+
+  if(!visibleGroups.length){
+    nav.innerHTML = '<div class="empty compact">No matching sections found.</div>';
+    renderSubNav(activeGroup);
+    return;
+  }
+
+  visibleGroups.forEach(group => {
+    const [groupName, firstTab, groupIcon] = group;
+    nav.insertAdjacentHTML('beforeend', `
+      <button class="nav-item ${groupName === activeGroup ? 'active' : ''}" data-main="${groupName}" data-tab="${firstTab}" onclick="switchMainTheme('${groupName}')">
+        ${groupIcon} <span>${groupName}</span>
+      </button>
+    `);
+  });
+
+  renderSubNav(activeGroup);
 }
 function filterNav(v){renderNav(v)}
 function switchMainTheme(groupName){
@@ -1321,7 +1527,11 @@ function renderSubNav(activeGroup){
   const sub = document.getElementById('subNavBar');
   if(!sub) return;
   const children = navItems.filter(i=>i[0]===activeGroup);
-  sub.innerHTML = children.map(i=>`<button type="button" data-tab="${i[1]}" onclick="switchTab('${i[1]}')">${i[2]} <span>${i[3]}</span></button>`).join('');
+  if(children.length <= 1){
+    sub.innerHTML = '';
+    return;
+  }
+  sub.innerHTML = children.map(i=>`<button type="button" data-main="${i[0]}" data-tab="${i[1]}" onclick="switchTab('${i[1]}')">${i[2]} <span>${i[3]}</span></button>`).join('');
 }
 function switchTab(tabId){
   const target = document.getElementById(tabId);
@@ -1331,10 +1541,12 @@ function switchTab(tabId){
   const item = navItems.find(i=>i[1]===tabId);
   const activeGroup = item ? item[0] : 'System';
   renderSubNav(activeGroup);
-  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.main===activeGroup));
+  document.querySelectorAll('#navList .nav-item').forEach(b=>b.classList.toggle('active',b.dataset.main===activeGroup));
   document.querySelectorAll('#subNavBar button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));
-  document.getElementById('pageTitle').textContent = item ? item[3] : 'FITNESS';
-  document.getElementById('pageSubtitle').textContent = pageSubtitle(tabId);
+  const title = document.getElementById('pageTitle');
+  const subtitle = document.getElementById('pageSubtitle');
+  if(title) title.textContent = item ? item[3] : 'FITNESS';
+  if(subtitle) subtitle.textContent = pageSubtitle(tabId);
   document.body.classList.remove('sidebar-open');
 
   if(tabId==='calendar') generateWorkoutCalendar();
@@ -1343,7 +1555,7 @@ function switchTab(tabId){
   updateDashboard();
 }
 function pageSubtitle(id){
-  return {dashboard:'Command Center',profile:'Locked profile view with edit controls',planner:'Challenges, boot camps, and training events',schedules:'Current & Old Workout Library',calendar:'Schedule sync with rest/recovery cycles',workoutLogs:'Today-based session logging',prs:'Workout-wise records and maximum volume',nutrition:'Automated nutrition estimation with visual bars',calculator:'TDEE & target engine',recovery:'Sleep and recovery inside Training',library:'Exercise, recipe, and creator databases'}[id] || '';
+  return {dashboard:'Command Center',profile:'Locked profile view with edit controls',settings:'Theme, sync, export/import, and account controls',planner:'Challenges, boot camps, and training events',schedules:'Current & Old Workout Library',calendar:'Schedule sync with rest/recovery cycles',workoutLogs:'Today-based session logging',prs:'Workout-wise records and maximum volume',nutrition:'Automated nutrition estimation with visual bars',calculator:'TDEE & target engine',recovery:'Sleep and recovery inside Training',library:'Exercise, recipe, and creator databases'}[id] || '';
 }
 
 /* =========================
@@ -2304,6 +2516,59 @@ updateDashboard = async function(){
   document.getElementById('mealCompletion').innerHTML=['Breakfast','Lunch','Dinner','Snack'].map(t=>`<span class="badge ${todayMeals.some(m=>m.MealType===t)?'success':''}">${t}</span>`).join('');
   renderMealHistory(meals0); renderCharts(exs,logs,prs,body); renderMuscleHeatmap(exs); renderPRDashboard(prs); runActionableIntelligence({logs,exs,meals:meals0,sleeps,waters:waters0,recovery}); renderLibraryHub(); populateTodayWorkoutSelector();
 }
+
+/* --- FINAL PERSONAL FITNESS BEHAVIOR PATCH --- */
+(function(){
+  const settingsIcon='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8.92 4a1.65 1.65 0 0 0 1-1.51V2a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15 3.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.46.5.82.96.96H21a2 2 0 1 1 0 4h-.09c-.46.14-.82.5-.96 1.04Z"></path></svg>';
+  if(Array.isArray(window.navItems || navItems) && !navItems.some(i=>i[1]==='settings')){
+    const profileIndex = navItems.findIndex(i=>i[1]==='profile');
+    navItems.splice(profileIndex + 1, 0, ['System','settings',settingsIcon,'Settings']);
+  }
+  const oldSubtitle = window.pageSubtitle || pageSubtitle;
+  window.pageSubtitle = pageSubtitle = function(id){
+    if(id==='settings') return 'Theme, sync, export/import, and account controls';
+    return oldSubtitle(id);
+  };
+  const oldSwitchTab = window.switchTab || switchTab;
+  window.switchTab = switchTab = function(tabId){
+    oldSwitchTab(tabId);
+    document.body.classList.remove('sidebar-open');
+    if(tabId==='settings') renderSettingsHub();
+  };
+  window.renderSettingsHub = function(){
+    const btn=document.getElementById('themeToggleText');
+    if(btn) btn.textContent=document.body.dataset.theme==='light'?'Dark Mode':'Light Mode';
+  };
+  const oldToast = window.toast;
+  if(typeof oldToast === 'function'){
+    window.toast = toast = function(message,type='success'){
+      const friendly={
+        'Workout schedule with set-by-set reps saved':'Workout schedule saved successfully.',
+        'Whole meal nutrition committed':'Meal saved with full nutrition totals.',
+        'Login successful':'Welcome back. Your fitness dashboard is ready.',
+        'Account created and logged in':'Account created. Your tracker is ready.',
+        'Exercise saved to suggestions':'Exercise saved to your library.'
+      };
+      return oldToast(friendly[message] || message, type);
+    };
+  }
+  function addScrim(){
+    if(!document.querySelector('.sidebar-scrim')){
+      const scrim=document.createElement('div'); scrim.className='sidebar-scrim'; scrim.onclick=()=>document.body.classList.remove('sidebar-open'); document.body.appendChild(scrim);
+    }
+  }
+  function labelMobileTables(){
+    document.querySelectorAll('table').forEach(table=>{
+      table.parentElement?.classList.add('mobile-card-table');
+      const heads=[...table.querySelectorAll('thead th, tr:first-child th')].map(th=>th.textContent.trim());
+      table.querySelectorAll('tbody tr, tr').forEach(tr=>[...tr.children].forEach((td,i)=>{if(td.tagName==='TD' && heads[i]) td.setAttribute('data-label',heads[i]);}));
+    });
+  }
+  window.addEventListener('DOMContentLoaded',()=>{addScrim();renderSettingsHub();setTimeout(labelMobileTables,800);});
+  const observer=new MutationObserver(()=>labelMobileTables());
+  window.addEventListener('DOMContentLoaded',()=>{const main=document.querySelector('main'); if(main) observer.observe(main,{childList:true,subtree:true});});
+})();
+
 window.addEventListener('DOMContentLoaded',async()=>{
   initThemeMode(); renderAdvancedCalculator();
   renderNav(); refreshProfileView(); toggleProfileEdit(false);
